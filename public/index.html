@@ -167,7 +167,8 @@ async function loadNews() {
   document.getElementById('main-content').innerHTML =
     `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
   try {
-    const res = await fetch(`/api/news?loc=${encodeURIComponent(currentLoc)}`);
+    const locMap = {'Türkiye':'Turkiye','Dünya':'Dunya','Ekonomi':'Ekonomi','Spor':'Spor','Teknoloji':'Teknoloji','İstanbul':'Istanbul'};
+const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     renderNews(data);
