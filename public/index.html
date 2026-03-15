@@ -167,29 +167,12 @@ async function loadNews() {
   document.getElementById('main-content').innerHTML =
     `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
   try {
-    // Adım 1: RSS çek (hızlı)
-    const rssRes = await fetch(`/api/rss?loc=${encodeURIComponent(currentLoc)}`);
-    if (!rssRes.ok) throw new Error(`RSS hatası: ${rssRes.status}`);
-    const rssData = await rssRes.json();
-
-    // Adım 2: Claude ile özetle (ayrı istek)
-    const sumRes = await fetch('/api/summarize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ candidates: rssData.candidates, location: currentLoc })
-    });
-    if (!sumRes.ok) throw new Error(`Özetleme hatası: ${sumRes.status}`);
-    const sumData = await sumRes.json();
-
-    const data = {
-      news: sumData.news,
-      articleCount: rssData.articleCount,
-      cacheAge: 0,
-      nextUpdateIn: 900
-    };
+    const res = await fetch(`/api/news?loc=${encodeURIComponent(currentLoc)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
     renderNews(data);
-    startCountdown(900);
-    setStatus('live', `Son güncelleme: az önce · ${rssData.articleCount} haber tarandı`);
+    startCountdown(data.nextUpdateIn || 900);
+    setStatus('live', `Son güncelleme: az önce · ${data.articleCount} haber tarandı`);
   } catch (err) {
     document.getElementById('main-content').innerHTML =
       `<div class="error-wrap">Haberler yüklenemedi: ${err.message}</div>`;
