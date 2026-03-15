@@ -28,7 +28,7 @@ app.get('/api/news', async (req, res) => {
     if (!data || !data.candidates.length) {
       return res.status(503).json({ error: 'Haber bulunamadı', articleCount: data?.articleCount || 0 });
     }
-    
+    data.candidates = data.candidates.filter(c => !isBlacklisted(c.title));
     const news = data.candidates.slice(0, 5).map((c, i) => ({
       rank: i + 1,
       category: guessCategory(c.title, loc),
@@ -67,7 +67,16 @@ app.get('/api/test', async (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+const SEO_BLACKLIST = [
+  'deprem mi oldu', 'nerede oldu', 'kac siddetinde', 
+  'son depremler', 'deprem buyuklugu', 'afad son',
+  'kandilli', 'hava durumu', 'namaz vakti', 'nöbetçi eczane'
+];
 
+function isBlacklisted(title) {
+  const t = (title || '').toLowerCase();
+  return SEO_BLACKLIST.some(function(kw) { return t.indexOf(kw) !== -1; });
+}
 function guessCategory(title, loc) {
   const t = (title || '').toLowerCase();
   if (t.includes('borsa') || t.includes('dolar') || t.includes('faiz') || t.includes('enflasyon')) return 'Ekonomi';
