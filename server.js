@@ -8,14 +8,26 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const LOCATIONS = ['Türkiye', 'Dünya', 'Ekonomi', 'Spor', 'Teknoloji', 'İstanbul'];
+const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'Istanbul'];
+const LOCATION_MAP = {
+  'Turkiye': 'Türkiye',
+  'Dunya': 'Dünya', 
+  'Ekonomi': 'Ekonomi',
+  'Spor': 'Spor',
+  'Teknoloji': 'Teknoloji',
+  'Istanbul': 'İstanbul',
+};
 
 app.get('/api/news', async (req, res) => {
-  const loc = req.query.loc || 'Türkiye';
-  if (!LOCATIONS.includes(loc)) return res.status(400).json({ error: 'Geçersiz lokasyon' });
+  const locKey = req.query.loc || 'Turkiye';
+  const loc = LOCATION_MAP[locKey];
+  if (!loc) return res.status(400).json({ error: 'Geçersiz lokasyon', received: locKey });
+  
   try {
     const data = await getTopNews(loc);
-    if (!data || !data.candidates.length) return res.status(503).json({ error: 'Haber bulunamadı' });
+    if (!data || !data.candidates.length) {
+      return res.status(503).json({ error: 'Haber bulunamadı', articleCount: data?.articleCount || 0 });
+    }
     
     const news = data.candidates.slice(0, 5).map((c, i) => ({
       rank: i + 1,
@@ -37,8 +49,18 @@ app.get('/api/news', async (req, res) => {
       nextUpdateIn: 900,
     });
   } catch (err) {
-    console.error(err);
+    console.error('[ERROR]', err.message);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/test', async (req, res) => {
+  try {
+    const fetch = require('node-fetch');
+    const r = await fetch('https://www.ntv.com.tr/son-dakika.rss', { timeout: 5000 });
+    res.json({ status: r.status, ok: r.ok });
+  } catch(e) {
+    res.json({ error: e.message });
   }
 });
 
@@ -47,14 +69,13 @@ app.get('*', (req, res) => {
 });
 
 function guessCategory(title, loc) {
-  const t = title.toLowerCase();
-  if (t.includes('borsa') || t.includes('dolar') || t.includes('faiz') || t.includes('enflasyon') || t.includes('ekonomi')) return 'Ekonomi';
+  const t = (title || '').toLowerCase();
+  if (t.includes('borsa') || t.includes('dolar') || t.includes('faiz') || t.includes('enflasyon')) return 'Ekonomi';
   if (t.includes('deprem')) return 'Deprem';
-  if (t.includes('savaş') || t.includes('saldırı') || t.includes('ordu') || t.includes('asker')) return 'Güvenlik';
-  if (t.includes('seçim') || t.includes('meclis') || t.includes('cumhurbaşkan') || t.includes('hükümet')) return 'Siyaset';
-  if (t.includes('maç') || t.includes('gol') || t.includes('futbol') || t.includes('spor') || t.includes('şampiyon')) return 'Spor';
-  if (t.includes('yapay zeka') || t.includes('teknoloji') || t.includes('iphone') || t.includes('yazılım')) return 'Teknoloji';
-  if (t.includes('istanbul') || t.includes('ankara') || t.includes('izmir')) return 'Şehir';
+  if (t.includes('savaş') || t.includes('saldırı') || t.includes('ordu')) return 'Güvenlik';
+  if (t.includes('seçim') || t.includes('meclis') || t.includes('cumhurbaşkan')) return 'Siyaset';
+  if (t.includes('maç') || t.includes('gol') || t.includes('futbol')) return 'Spor';
+  if (t.includes('yapay zeka') || t.includes('teknoloji') || t.includes('iphone')) return 'Teknoloji';
   if (loc === 'Spor') return 'Spor';
   if (loc === 'Ekonomi') return 'Ekonomi';
   if (loc === 'Teknoloji') return 'Teknoloji';
