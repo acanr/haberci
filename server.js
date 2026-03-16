@@ -114,16 +114,16 @@ async function fetchFromRSS(location) {
     const key = item.title.slice(0, 30).toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
-    // Her kaynaktan max 2 haber
+    // Her kaynaktan max 4 haber
     sourceCounts[item.source] = (sourceCounts[item.source] || 0) + 1;
-    if (sourceCounts[item.source] > 2) return false;
+    if (sourceCounts[item.source] > 4) return false;
     // Spam/ilan filtresi
     const titleLower = item.title.toLowerCase();
     if (SPAM_KEYWORDS.some(kw => titleLower.includes(kw))) return false;
     return true;
   });
 
-  const news = unique.slice(0, 5).map((item, i) => ({
+  const news = unique.slice(0, 10).map((item, i) => ({
     rank: i + 1,
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
