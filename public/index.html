@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Haberimvar — Günün En Önemli Haberleri</title>
+  <title>Haberimvar — Günün En Önemli 10 Haberi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
@@ -52,7 +52,7 @@
     .news-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
     .news-card { background: var(--surface); padding: 22px 26px; display: flex; gap: 20px; align-items: flex-start; transition: background 0.15s; cursor: pointer; border: none; text-align: left; width: 100%; font-family: var(--font-body); }
     .news-card:hover { background: var(--surface-2); }
-    .rank-num { font-family: var(--font-display); font-size: 26px; font-weight: 400; color: var(--ink-4); line-height: 1; flex-shrink: 0; padding-top: 2px; }
+    .rank-num { font-family: var(--font-display); font-size: 26px; font-weight: 400; color: var(--ink-4); line-height: 1; flex-shrink: 0; padding-top: 2px; min-width: 36px; }
     .news-body { flex: 1; min-width: 0; }
     .news-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
     .cat-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 4px; }
@@ -90,7 +90,6 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .fade-in { animation: fadeIn 0.4s ease both; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
-    .news-card:nth-child(1){animation-delay:0ms}.news-card:nth-child(2){animation-delay:50ms}.news-card:nth-child(3){animation-delay:100ms}.news-card:nth-child(4){animation-delay:150ms}.news-card:nth-child(5){animation-delay:200ms}
     @media(max-width:600px){.hero{padding:28px 16px 20px}.controls-bar,.status-bar{padding:12px 16px}.main{padding:20px 16px 60px}.news-card{padding:18px 14px;gap:14px}.nav-date{display:none}}
   </style>
   <!-- Google tag (gtag.js) -->
@@ -112,8 +111,8 @@
 </nav>
 <div class="hero">
   <div class="hero-eyebrow">Yapay Zeka Destekli · Her 15 Dakika Güncellenir</div>
-  <h1 class="hero-title">Günün en önemli<br><em>5 haberi.</em></h1>
-  <p class="hero-sub">Türkiye ve dünyadan haberler toplanır, yapay zeka özetler.</p>
+  <h1 class="hero-title">Günün en önemli<br><em>10 haberi.</em></h1>
+  <p class="hero-sub">Türkiye ve dünyadan haberler toplanır, önem sırasına göre sıralanır.</p>
 </div>
 <div class="status-bar">
   <div class="status-dot" id="status-dot"></div>
@@ -146,7 +145,7 @@
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
   <div class="modal">
     <div class="modal-title">Günlük bildirim al</div>
-    <div class="modal-sub">Her sabah 08:00'de seçtiğin kategorinin en önemli 5 haberi e-postana gelsin.</div>
+    <div class="modal-sub">Her sabah 08:00'de seçtiğin kategorinin en önemli haberleri e-postana gelsin.</div>
     <input class="modal-input" type="email" placeholder="E-posta adresin" id="email-input" />
     <button class="modal-btn" onclick="subscribe()">Abone ol</button>
     <button class="modal-close" onclick="closeModal()">Vazgeç</button>
@@ -191,19 +190,20 @@ async function loadNews() {
 function renderNews(data) {
   const main = document.getElementById('main-content');
   if (!data.news?.length) { main.innerHTML = '<div class="error-wrap">Haber bulunamadı.</div>'; return; }
+  const rankStr = n => n.rank < 10 ? '0' + n.rank : '' + n.rank;
   let html = '<div class="news-grid">';
   data.news.forEach((item, i) => {
-    html += `<button class="news-card fade-in" onclick="openNews(${i})">
-      <div class="rank-num">0${item.rank}</div>
+    html += `<button class="news-card fade-in" style="animation-delay:${i*40}ms" onclick="openNews(${i})">
+      <div class="rank-num">${rankStr(item)}</div>
       <div class="news-body">
         <div class="news-meta">
           <span class="cat-badge">${item.category}</span>
-          ${item.isBreaking?'<span class="breaking-badge">● Son Dakika</span>':''}
-          ${item.sourceCount>1?`<span class="src-badge">${item.sourceCount} kaynak</span>`:''}
+          ${item.isBreaking ? '<span class="breaking-badge">● Son Dakika</span>' : ''}
+          ${item.sourceCount > 1 ? `<span class="src-badge">${item.sourceCount} kaynak</span>` : ''}
         </div>
         <div class="news-headline">${item.headline}</div>
         <div class="news-summary">${item.summary}</div>
-        ${item.sources?.length?`<div class="news-sources">${item.sources.join(' · ')}</div>`:''}
+        ${item.sources?.length ? `<div class="news-sources">${item.sources.join(' · ')}</div>` : ''}
       </div>
       <div class="news-arrow">→</div>
     </button>`;
@@ -224,7 +224,7 @@ function openDetail(idx) {
   document.getElementById('d-cat').textContent = item.category;
   document.getElementById('d-title').textContent = item.headline;
   document.getElementById('d-body').textContent = item.summary;
-  document.getElementById('d-sources').textContent = item.sources?.length ? 'Kaynaklar: '+item.sources.join(', ') : '';
+  document.getElementById('d-sources').textContent = item.sources?.length ? 'Kaynak: ' + item.sources.join(', ') : '';
   const link = document.getElementById('d-link');
   if (item.link) { link.href = item.link; link.style.display = 'inline-block'; }
   else { link.style.display = 'none'; }
@@ -232,22 +232,22 @@ function openDetail(idx) {
 }
 function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
 function openModal() { document.getElementById('modal').classList.add('open'); }
-function closeModal(e) { if (!e||e.target===document.getElementById('modal')) document.getElementById('modal').classList.remove('open'); }
+function closeModal(e) { if (!e || e.target === document.getElementById('modal')) document.getElementById('modal').classList.remove('open'); }
 function subscribe() {
   const email = document.getElementById('email-input').value;
   if (!email.includes('@')) { showToast('Geçerli bir e-posta girin'); return; }
   closeModal(); showToast('✓ Abone oldunuz! Yarın 08:00\'de ilk haberiniz gelecek.');
 }
-function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
-function setStatus(type, text) { const d=document.getElementById('status-dot'); d.className='status-dot'+(type?' '+type:''); document.getElementById('status-text').innerHTML=text; }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+function setStatus(type, text) { const d = document.getElementById('status-dot'); d.className = 'status-dot' + (type ? ' ' + type : ''); document.getElementById('status-text').innerHTML = text; }
 function startCountdown(seconds) {
-  clearInterval(countdownInterval); nextUpdateSec=seconds; updateCountdown();
-  countdownInterval=setInterval(()=>{ nextUpdateSec--; if(nextUpdateSec<=0){loadNews();return;} updateCountdown(); },1000);
+  clearInterval(countdownInterval); nextUpdateSec = seconds; updateCountdown();
+  countdownInterval = setInterval(() => { nextUpdateSec--; if (nextUpdateSec <= 0) { loadNews(); return; } updateCountdown(); }, 1000);
 }
-function updateCountdown() { const m=Math.floor(nextUpdateSec/60),s=nextUpdateSec%60; document.getElementById('next-update').textContent=`Sonraki: ${m}:${String(s).padStart(2,'0')}`; }
+function updateCountdown() { const m = Math.floor(nextUpdateSec / 60), s = nextUpdateSec % 60; document.getElementById('next-update').textContent = `Sonraki: ${m}:${String(s).padStart(2, '0')}`; }
 
 loadNews();
-setInterval(loadNews, 15*60*1000);
+setInterval(loadNews, 15 * 60 * 1000);
 </script>
 </body>
 </html>
