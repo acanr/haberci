@@ -68,7 +68,16 @@
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
     .detail-panel { position: fixed; inset: 0; z-index: 150; display: flex; align-items: flex-end; pointer-events: none; }
-    .detail-panel.open { pointer-events: all; }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1JEZC9B1CE');
+  </script>
+  <body>
+  </script>.detail-panel.open { pointer-events: all; }
     .detail-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.25s; }
     .detail-panel.open .detail-backdrop { opacity: 1; }
     .detail-sheet { position: relative; z-index: 1; width: 100%; max-height: 80vh; background: white; border-radius: var(--radius) var(--radius) 0 0; padding: 28px 28px 48px; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); }
