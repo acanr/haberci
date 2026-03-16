@@ -8,18 +8,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
-// Çalışan RSS kaynakları — kategori bazlı, çoklu kaynak
 const RSS_SOURCES = {
   'Turkiye': [
-    { name: 'NTV',      url: 'https://www.ntv.com.tr/gundem.rss' },
-    { name: 'Hürriyet', url: 'https://www.hurriyet.com.tr/rss/anasayfa' },
-    { name: 'Sözcü',    url: 'https://www.sozcu.com.tr/rss/anasayfa.xml' },
+    { name: 'NTV',       url: 'https://www.ntv.com.tr/gundem.rss' },
+    { name: 'Hürriyet',  url: 'https://www.hurriyet.com.tr/rss/anasayfa' },
+    { name: 'Sözcü',     url: 'https://www.sozcu.com.tr/rss/anasayfa.xml' },
     { name: 'DW Türkçe', url: 'https://rss.dw.com/rdf/rss-tur-all' },
   ],
   'Dunya': [
-    { name: 'NTV Dünya',  url: 'https://www.ntv.com.tr/dunya.rss' },
+    { name: 'NTV Dünya',      url: 'https://www.ntv.com.tr/dunya.rss' },
     { name: 'Hürriyet Dünya', url: 'https://www.hurriyet.com.tr/rss/dunya' },
-    { name: 'DW Türkçe',  url: 'https://rss.dw.com/rdf/rss-tur-all' },
+    { name: 'DW Türkçe',      url: 'https://rss.dw.com/rdf/rss-tur-all' },
   ],
   'Ekonomi': [
     { name: 'NTV Ekonomi',      url: 'https://www.ntv.com.tr/ekonomi.rss' },
@@ -38,13 +37,11 @@ const RSS_SOURCES = {
   ],
 };
 
-// Spam / ilan filtresi
 const SPAM_KEYWORDS = [
   'ihale', 'satın alma daire', 'müdürlüğü ilanı', 'ihalesi',
   'şartname', 'teklif zarfı', 'resmi ilan', 'ilan no',
 ];
 
-// Önem puanı için anahtar kelimeler
 const IMPORTANCE_KEYWORDS = {
   'deprem': 30, 'sel': 20, 'yangın': 20, 'patlama': 25,
   'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
@@ -57,13 +54,12 @@ const IMPORTANCE_KEYWORDS = {
 
 const cache = new Map();
 
-// HTML entity decode
 function decodeEntities(str) {
   return (str || '')
     .replace(/&#x27;/g, "'").replace(/&#39;/g, "'")
     .replace(/&amp;/g, '&').replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>').replace(/&quot;/g, '"')
-    .replace(/&#\d+;/g, '').trim();
+    .replace(/&apos;/g, "'").replace(/&#\d+;/g, '').trim();
 }
 
 function extractTag(xml, tag) {
@@ -107,35 +103,28 @@ async function fetchRSS(source) {
 
 function isSpam(title) {
   const t = title.toLowerCase();
-  // Tamamen büyük harf = ilan
   if (title.length > 15 && title === title.toUpperCase()) return true;
-  // Spam anahtar kelimeleri
   if (SPAM_KEYWORDS.some(kw => t.includes(kw))) return true;
-  // Çok kısa başlık
   if (title.length < 15) return true;
   return false;
 }
 
-function scoreItem(item, location) {
+function scoreItem(item) {
   const t = (item.title + ' ' + (item.description || '')).toLowerCase();
   let score = 0;
 
-  // Önem kelimesi puanı
   for (const [kw, pts] of Object.entries(IMPORTANCE_KEYWORDS)) {
     if (t.includes(kw)) score += pts;
   }
 
-  // Tazelik puanı
   if (item.pubDate) {
-    const age = Date.now() - new Date(item.pubDate).getTime();
-    const ageHours = age / (1000 * 60 * 60);
+    const ageHours = (Date.now() - new Date(item.pubDate).getTime()) / (1000 * 60 * 60);
     if (ageHours < 1) score += 30;
     else if (ageHours < 3) score += 20;
     else if (ageHours < 6) score += 10;
     else if (ageHours < 12) score += 5;
   }
 
-  // Kaynak güvenilirlik puanı
   if (item.source === 'NTV' || item.source === 'NTV Gündem') score += 5;
   if (item.source === 'DW Türkçe') score += 5;
 
@@ -166,28 +155,22 @@ async function fetchNews(location) {
 
   console.log(`[RSS] ${location}: ${allItems.length} ham haber`);
 
-  // Spam filtrele
   const clean = allItems.filter(item => !isSpam(item.title));
 
-  // Tekrar eden başlıkları çıkar
   const seen = new Set();
   const sourceCounts = {};
   const unique = clean.filter(item => {
     const key = item.title.slice(0, 35).toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
-    // Her kaynaktan max 4 haber
     sourceCounts[item.source] = (sourceCounts[item.source] || 0) + 1;
     if (sourceCounts[item.source] > 4) return false;
     return true;
   });
 
-  // Önem puanına göre sırala
   const sorted = unique
-    .map(item => ({ ...item, score: scoreItem(item, location) }))
+    .map(item => ({ ...item, score: scoreItem(item) }))
     .sort((a, b) => b.score - a.score);
-
-  console.log(`[RSS] ${location}: ${sorted.length} haber sıralandı, ilk 10 alınıyor`);
 
   const news = sorted.slice(0, 10).map((item, i) => ({
     rank: i + 1,
