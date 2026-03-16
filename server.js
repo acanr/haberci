@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -11,16 +10,13 @@ const GNEWS_KEY = process.env.GNEWS_API_KEY;
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'Istanbul'];
 
 const GNEWS_PARAMS = {
-  'Turkiye':     { lang: 'tr', country: 'tr', topic: 'breaking-news', q: 'türkiye OR ankara OR erdoğan OR meclis OR hükümet' },
-  'SonHaberler': { lang: 'tr', country: 'tr', topic: 'breaking-news' },
-  'Dunya':       { lang: 'tr', topic: 'world' },
-  'Ekonomi':     { lang: 'tr', country: 'tr', topic: 'business' },
-  'Spor':        { lang: 'tr', country: 'tr', topic: 'sports' },
-  'Teknoloji':   { lang: 'tr', topic: 'technology' },
-  'Istanbul':    { lang: 'tr', q: 'istanbul' },
+  'Turkiye':   { lang: 'tr', country: 'tr', q: 'Türkiye' },
+  'Dunya':     { lang: 'tr', q: 'dünya' },
+  'Ekonomi':   { lang: 'tr', country: 'tr', q: 'ekonomi' },
+  'Spor':      { lang: 'tr', country: 'tr', q: 'spor' },
+  'Teknoloji': { lang: 'tr', country: 'tr', q: 'teknoloji' },
+  'Istanbul':  { lang: 'tr', country: 'tr', q: 'istanbul' },
 };
-
-const LOCATIONS = ['Turkiye', 'SonHaberler', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'Istanbul'];
 
 const LOC_DISPLAY = {
   'Turkiye': 'Turkiye', 'Dunya': 'Dunya', 'Ekonomi': 'Ekonomi',
@@ -32,10 +28,10 @@ const cache = new Map();
 async function fetchNews(location) {
   const fetch = require('node-fetch');
   const params = GNEWS_PARAMS[location] || GNEWS_PARAMS['Turkiye'];
-  
+
   let url = 'https://gnews.io/api/v4/top-headlines?';
   url += 'lang=' + params.lang;
-  url += '&country=' + params.country;
+  if (params.country) url += '&country=' + params.country;
   if (params.topic) url += '&topic=' + params.topic;
   if (params.q) url += '&q=' + encodeURIComponent(params.q);
   url += '&max=10';
@@ -44,7 +40,7 @@ async function fetchNews(location) {
   const res = await fetch(url, { timeout: 8000 });
   if (!res.ok) throw new Error('GNews API hatasi: ' + res.status);
   const data = await res.json();
-  
+
   if (!data.articles || data.articles.length === 0) {
     throw new Error('Haber bulunamadi');
   }
