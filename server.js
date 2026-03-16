@@ -10,7 +10,7 @@ const GNEWS_KEY = process.env.GNEWS_API_KEY;
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
 const GNEWS_PARAMS = {
-  'Turkiye':   { lang: 'tr', country: 'tr', q: 'Türkiye' },
+ 'Turkiye': { lang: 'tr', country: 'tr', q: 'türkiye OR ankara OR erdoğan OR meclis OR hükümet OR tbmm' },
   'Dunya':     { lang: 'tr', q: 'dünya' },
   'Ekonomi':   { lang: 'tr', country: 'tr', q: 'ekonomi' },
   'Spor':      { lang: 'tr', country: 'tr', q: 'spor' },
