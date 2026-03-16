@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- <title>Haberimvar — Günün En Önemli 5 Haberi</title>
+  <title>Haberimvar — Günün En Önemli 5 Haberi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
@@ -68,16 +68,7 @@
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
     .detail-panel { position: fixed; inset: 0; z-index: 150; display: flex; align-items: flex-end; pointer-events: none; }
-  </style>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
-  <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-1JEZC9B1CE');
-  </script>
-  <body>
-  </script>.detail-panel.open { pointer-events: all; }
+    .detail-panel.open { pointer-events: all; }
     .detail-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.25s; }
     .detail-panel.open .detail-backdrop { opacity: 1; }
     .detail-sheet { position: relative; z-index: 1; width: 100%; max-height: 80vh; background: white; border-radius: var(--radius) var(--radius) 0 0; padding: 28px 28px 48px; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); }
@@ -87,6 +78,8 @@
     .detail-title { font-family: var(--font-display); font-size: 26px; line-height: 1.25; margin-bottom: 16px; }
     .detail-body { font-size: 15px; color: var(--ink-2); line-height: 1.75; font-weight: 300; }
     .detail-sources { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-3); }
+    .detail-link { display: inline-block; margin-top: 16px; color: var(--accent); font-size: 13px; text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+    .detail-link:hover { border-bottom-color: var(--accent); }
     .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
     .modal { background: white; border-radius: var(--radius); padding: 32px; max-width: 380px; width: 100%; transform: translateY(8px); transition: transform 0.2s; }
@@ -104,13 +97,13 @@
     @media(max-width:600px){.hero{padding:28px 16px 20px}.controls-bar,.status-bar{padding:12px 16px}.main{padding:20px 16px 60px}.news-card{padding:18px 14px;gap:14px}.news-card.featured{padding:22px 14px}.nav-date{display:none}}
   </style>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-1JEZC9B1CE');
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1JEZC9B1CE');
+  </script>
 </head>
 <body>
 <nav>
@@ -123,7 +116,7 @@
 <div class="hero">
   <div class="hero-eyebrow">Yapay Zeka Destekli · Her 15 Dakika Güncellenir</div>
   <h1 class="hero-title">Günün en önemli<br><em>5 haberi.</em></h1>
-  <p class="hero-sub">RSS kaynaklarından çekilen haberler frekans ve hıza göre skorlanır, yapay zeka özetler.</p>
+  <p class="hero-sub">Türkiye ve dünyadan haberler toplanır, yapay zeka özetler.</p>
 </div>
 <div class="status-bar">
   <div class="status-dot" id="status-dot"></div>
@@ -151,6 +144,7 @@
     <div class="detail-title" id="d-title"></div>
     <div class="detail-body" id="d-body"></div>
     <div class="detail-sources" id="d-sources"></div>
+    <a class="detail-link" id="d-link" target="_blank" rel="noopener">Haberin tamamını oku →</a>
   </div>
 </div>
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
@@ -185,7 +179,7 @@ async function loadNews() {
     `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
   try {
     const locMap = {'Türkiye':'Turkiye','Dünya':'Dunya','Ekonomi':'Ekonomi','Spor':'Spor','Teknoloji':'Teknoloji','İstanbul':'Istanbul'};
-const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
+    const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     renderNews(data);
@@ -229,6 +223,9 @@ function openDetail(idx) {
   document.getElementById('d-title').textContent = item.headline;
   document.getElementById('d-body').textContent = item.summary;
   document.getElementById('d-sources').textContent = item.sources?.length ? 'Kaynaklar: '+item.sources.join(', ') : '';
+  const link = document.getElementById('d-link');
+  if (item.link) { link.href = item.link; link.style.display = 'inline-block'; }
+  else { link.style.display = 'none'; }
   document.getElementById('detail-panel').classList.add('open');
 }
 function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
@@ -246,7 +243,6 @@ function startCountdown(seconds) {
   countdownInterval=setInterval(()=>{ nextUpdateSec--; if(nextUpdateSec<=0){loadNews();return;} updateCountdown(); },1000);
 }
 function updateCountdown() { const m=Math.floor(nextUpdateSec/60),s=nextUpdateSec%60; document.getElementById('next-update').textContent=`Sonraki: ${m}:${String(s).padStart(2,'0')}`; }
-function formatAge(sec) { if(!sec||sec<60) return 'az önce'; return `${Math.floor(sec/60)} dk önce`; }
 
 loadNews();
 setInterval(loadNews, 15*60*1000);
