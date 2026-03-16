@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const GNEWS_KEY = process.env.GNEWS_API_KEY;
-const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'Istanbul'];
+const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
 const GNEWS_PARAMS = {
   'Turkiye':   { lang: 'tr', country: 'tr', q: 'Türkiye' },
@@ -15,12 +15,11 @@ const GNEWS_PARAMS = {
   'Ekonomi':   { lang: 'tr', country: 'tr', q: 'ekonomi' },
   'Spor':      { lang: 'tr', country: 'tr', q: 'spor' },
   'Teknoloji': { lang: 'tr', country: 'tr', q: 'teknoloji' },
-  'Istanbul':  { lang: 'tr', country: 'tr', q: 'istanbul' },
 };
 
 const LOC_DISPLAY = {
   'Turkiye': 'Turkiye', 'Dunya': 'Dunya', 'Ekonomi': 'Ekonomi',
-  'Spor': 'Spor', 'Teknoloji': 'Teknoloji', 'Istanbul': 'Istanbul',
+  'Spor': 'Spor', 'Teknoloji': 'Teknoloji',
 };
 
 const cache = new Map();
