@@ -52,7 +52,6 @@
     .news-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
     .news-card { background: var(--surface); padding: 22px 26px; display: flex; gap: 20px; align-items: flex-start; transition: background 0.15s; cursor: pointer; border: none; text-align: left; width: 100%; font-family: var(--font-body); }
     .news-card:hover { background: var(--surface-2); }
-    .news-card.featured { padding: 30px 26px; }
     .rank-num { font-family: var(--font-display); font-size: 26px; font-weight: 400; color: var(--ink-4); line-height: 1; flex-shrink: 0; padding-top: 2px; }
     .news-body { flex: 1; min-width: 0; }
     .news-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
@@ -92,7 +91,7 @@
     .fade-in { animation: fadeIn 0.4s ease both; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
     .news-card:nth-child(1){animation-delay:0ms}.news-card:nth-child(2){animation-delay:50ms}.news-card:nth-child(3){animation-delay:100ms}.news-card:nth-child(4){animation-delay:150ms}.news-card:nth-child(5){animation-delay:200ms}
-    @media(max-width:600px){.hero{padding:28px 16px 20px}.controls-bar,.status-bar{padding:12px 16px}.main{padding:20px 16px 60px}.news-card{padding:18px 14px;gap:14px}.news-card.featured{padding:22px 14px}.nav-date{display:none}}
+    @media(max-width:600px){.hero{padding:28px 16px 20px}.controls-bar,.status-bar{padding:12px 16px}.main{padding:20px 16px 60px}.news-card{padding:18px 14px;gap:14px}.nav-date{display:none}}
   </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
@@ -128,7 +127,6 @@
     <button class="pill" data-loc="Ekonomi">📊 Ekonomi</button>
     <button class="pill" data-loc="Teknoloji">💻 Teknoloji</button>
     <button class="pill" data-loc="Spor">⚽ Spor</button>
-    <button class="pill" data-loc="İstanbul">🏙 İstanbul</button>
   </div>
 </div>
 <main class="main" id="main-content">
@@ -176,7 +174,7 @@ async function loadNews() {
   document.getElementById('main-content').innerHTML =
     `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
   try {
-    const locMap = {'Türkiye':'Turkiye','Dünya':'Dunya','Ekonomi':'Ekonomi','Spor':'Spor','Teknoloji':'Teknoloji','İstanbul':'Istanbul'};
+    const locMap = {'Türkiye':'Turkiye','Dünya':'Dunya','Ekonomi':'Ekonomi','Spor':'Spor','Teknoloji':'Teknoloji'};
     const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -195,7 +193,7 @@ function renderNews(data) {
   if (!data.news?.length) { main.innerHTML = '<div class="error-wrap">Haber bulunamadı.</div>'; return; }
   let html = '<div class="news-grid">';
   data.news.forEach((item, i) => {
-    html += `<button class="news-card ${i===0?'featured':''} fade-in" onclick="openDetail(${i})">
+    html += `<button class="news-card fade-in" onclick="openNews(${i})">
       <div class="rank-num">0${item.rank}</div>
       <div class="news-body">
         <div class="news-meta">
@@ -213,6 +211,12 @@ function renderNews(data) {
   html += '</div>';
   main.innerHTML = html;
   window._newsData = data.news;
+}
+
+function openNews(idx) {
+  const item = window._newsData?.[idx]; if (!item) return;
+  if (item.link) { window.open(item.link, '_blank', 'noopener'); }
+  else { openDetail(idx); }
 }
 
 function openDetail(idx) {
