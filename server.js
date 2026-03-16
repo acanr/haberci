@@ -11,13 +11,16 @@ const GNEWS_KEY = process.env.GNEWS_API_KEY;
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'Istanbul'];
 
 const GNEWS_PARAMS = {
-'Turkiye': { lang: 'tr', country: 'tr', q: 'Türkiye' },
-'Dunya':     { lang: 'tr', q: 'dünya' },
-'Ekonomi':   { lang: 'tr', country: 'tr', q: 'ekonomi' },
-'Spor':      { lang: 'tr', country: 'tr', q: 'spor' },
-'Teknoloji': { lang: 'tr', country: 'tr', q: 'teknoloji' },
-'Istanbul':  { lang: 'tr', country: 'tr', q: 'istanbul' },
+  'Turkiye':     { lang: 'tr', country: 'tr', topic: 'breaking-news', q: 'türkiye OR ankara OR erdoğan OR meclis OR hükümet' },
+  'SonHaberler': { lang: 'tr', country: 'tr', topic: 'breaking-news' },
+  'Dunya':       { lang: 'tr', topic: 'world' },
+  'Ekonomi':     { lang: 'tr', country: 'tr', topic: 'business' },
+  'Spor':        { lang: 'tr', country: 'tr', topic: 'sports' },
+  'Teknoloji':   { lang: 'tr', topic: 'technology' },
+  'Istanbul':    { lang: 'tr', q: 'istanbul' },
 };
+
+const LOCATIONS = ['Turkiye', 'SonHaberler', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'Istanbul'];
 
 const LOC_DISPLAY = {
   'Turkiye': 'Turkiye', 'Dunya': 'Dunya', 'Ekonomi': 'Ekonomi',
