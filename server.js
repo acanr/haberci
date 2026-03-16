@@ -9,7 +9,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 const GNEWS_KEY = process.env.GNEWS_API_KEY;
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
-// RSS Kaynakları — kategori bazlı
 const RSS_SOURCES = {
   'Turkiye': [
     { name: 'NTV',      url: 'https://www.ntv.com.tr/son-dakika.rss' },
@@ -34,7 +33,6 @@ const RSS_SOURCES = {
   ],
 };
 
-// GNews yedek parametreleri
 const GNEWS_PARAMS = {
   'Turkiye':   { lang: 'tr', country: 'tr', q: 'türkiye OR ankara OR erdoğan OR meclis OR hükümet OR tbmm' },
   'Dunya':     { lang: 'tr', q: 'dünya' },
@@ -43,9 +41,10 @@ const GNEWS_PARAMS = {
   'Teknoloji': { lang: 'tr', country: 'tr', q: 'teknoloji' },
 };
 
+const SPAM_KEYWORDS = ['ihale', 'satın alma', 'daire başkanlığı', 'müdürlüğü ilanı', 'ihalesi', 'şartname', 'teklif zarfı'];
+
 const cache = new Map();
 
-// RSS parse yardımcı
 function extractTag(xml, tag) {
   const match = xml.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i'));
   if (!match) return '';
@@ -107,14 +106,20 @@ async function fetchFromRSS(location) {
     .flatMap(r => r.value);
 
   console.log(`[RSS] ${location}: ${allItems.length} haber`);
-  if (allItems.length < 3) return null; // yetersizse GNews'e düş
+  if (allItems.length < 3) return null;
 
-  // Tekrar eden haberleri filtrele, skora göre sırala
   const seen = new Set();
+  const sourceCounts = {};
   const unique = allItems.filter(item => {
     const key = item.title.slice(0, 30).toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
+    // Her kaynaktan max 2 haber
+    sourceCounts[item.source] = (sourceCounts[item.source] || 0) + 1;
+    if (sourceCounts[item.source] > 2) return false;
+    // Spam/ilan filtresi
+    const titleLower = item.title.toLowerCase();
+    if (SPAM_KEYWORDS.some(kw => titleLower.includes(kw))) return false;
     return true;
   });
 
@@ -164,14 +169,20 @@ async function fetchFromGNews(location) {
     link: a.url,
   }));
 
-  return { news, articleCount: data.articles.length, location, updatedAt: Date.now(), cacheAge: 0, nextUpdateIn: 900, source: 'gnews' };
+  return {
+    news,
+    articleCount: data.articles.length,
+    location,
+    updatedAt: Date.now(),
+    cacheAge: 0,
+    nextUpdateIn: 900,
+    source: 'gnews',
+  };
 }
 
 async function fetchNews(location) {
-  // Önce RSS dene
   const rssData = await fetchFromRSS(location);
   if (rssData) return rssData;
-  // RSS yetersizse GNews
   console.log(`[FALLBACK] ${location} GNews'e düşüyor`);
   return await fetchFromGNews(location);
 }
@@ -183,7 +194,11 @@ app.get('/api/news', async function(req, res) {
   }
   const cached = cache.get(loc);
   if (cached && (Date.now() - cached.updatedAt) < 15 * 60 * 1000) {
-    return res.json({ ...cached, cacheAge: Math.round((Date.now() - cached.updatedAt) / 1000), nextUpdateIn: Math.max(0, Math.round((cached.updatedAt + 900000 - Date.now()) / 1000)) });
+    return res.json({
+      ...cached,
+      cacheAge: Math.round((Date.now() - cached.updatedAt) / 1000),
+      nextUpdateIn: Math.max(0, Math.round((cached.updatedAt + 900000 - Date.now()) / 1000))
+    });
   }
   try {
     const data = await fetchNews(loc);
