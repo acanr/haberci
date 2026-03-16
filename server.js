@@ -11,12 +11,12 @@ const GNEWS_KEY = process.env.GNEWS_API_KEY;
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'Istanbul'];
 
 const GNEWS_PARAMS = {
-  'Turkiye':   { lang: 'tr', country: 'tr', topic: 'breaking-news' },
-  'Dunya':     { lang: 'tr', country: 'tr', topic: 'world' },
-  'Ekonomi':   { lang: 'tr', country: 'tr', topic: 'business' },
-  'Spor':      { lang: 'tr', country: 'tr', topic: 'sports' },
-  'Teknoloji': { lang: 'tr', country: 'tr', topic: 'technology' },
-  'Istanbul':  { lang: 'tr', country: 'tr', q: 'istanbul', topic: 'breaking-news' },
+'Turkiye': { lang: 'tr', country: 'tr', q: 'Türkiye' },
+'Dunya':     { lang: 'tr', q: 'dünya' },
+'Ekonomi':   { lang: 'tr', country: 'tr', q: 'ekonomi' },
+'Spor':      { lang: 'tr', country: 'tr', q: 'spor' },
+'Teknoloji': { lang: 'tr', country: 'tr', q: 'teknoloji' },
+'Istanbul':  { lang: 'tr', country: 'tr', q: 'istanbul' },
 };
 
 const LOC_DISPLAY = {
