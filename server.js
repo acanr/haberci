@@ -6,49 +6,70 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const GNEWS_KEY = process.env.GNEWS_API_KEY;
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
+// Çalışan RSS kaynakları — kategori bazlı, çoklu kaynak
 const RSS_SOURCES = {
   'Turkiye': [
-    { name: 'NTV',      url: 'https://www.ntv.com.tr/son-dakika.rss' },
+    { name: 'NTV',      url: 'https://www.ntv.com.tr/gundem.rss' },
     { name: 'Hürriyet', url: 'https://www.hurriyet.com.tr/rss/anasayfa' },
     { name: 'Sözcü',    url: 'https://www.sozcu.com.tr/rss/anasayfa.xml' },
+    { name: 'DW Türkçe', url: 'https://rss.dw.com/rdf/rss-tur-all' },
   ],
   'Dunya': [
-    { name: 'NTV Dünya',      url: 'https://www.ntv.com.tr/dunya.rss' },
+    { name: 'NTV Dünya',  url: 'https://www.ntv.com.tr/dunya.rss' },
     { name: 'Hürriyet Dünya', url: 'https://www.hurriyet.com.tr/rss/dunya' },
+    { name: 'DW Türkçe',  url: 'https://rss.dw.com/rdf/rss-tur-all' },
   ],
   'Ekonomi': [
     { name: 'NTV Ekonomi',      url: 'https://www.ntv.com.tr/ekonomi.rss' },
     { name: 'Hürriyet Ekonomi', url: 'https://www.hurriyet.com.tr/rss/ekonomi' },
+    { name: 'Sözcü Ekonomi',    url: 'https://www.sozcu.com.tr/rss/ekonomi.xml' },
   ],
   'Spor': [
-    { name: 'NTV Spor',      url: 'https://www.ntv.com.tr/spor.rss' },
+    { name: 'NTV Gündem',    url: 'https://www.ntv.com.tr/gundem.rss' },
     { name: 'Hürriyet Spor', url: 'https://www.hurriyet.com.tr/rss/spor' },
+    { name: 'Sözcü Spor',    url: 'https://www.sozcu.com.tr/rss/spor.xml' },
   ],
   'Teknoloji': [
-    { name: 'Webtekno',    url: 'https://www.webtekno.com/rss.xml' },
-    { name: 'ShiftDelete', url: 'https://shiftdelete.net/feed' },
+    { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss' },
+    { name: 'Webtekno',      url: 'https://www.webtekno.com/rss.xml' },
+    { name: 'ShiftDelete',   url: 'https://shiftdelete.net/feed' },
   ],
 };
 
-const GNEWS_PARAMS = {
-  'Turkiye':   { lang: 'tr', country: 'tr', q: 'türkiye OR ankara OR erdoğan OR meclis OR hükümet OR tbmm' },
-  'Dunya':     { lang: 'tr', q: 'dünya' },
-  'Ekonomi':   { lang: 'tr', country: 'tr', q: 'ekonomi' },
-  'Spor':      { lang: 'tr', country: 'tr', q: 'spor' },
-  'Teknoloji': { lang: 'tr', country: 'tr', q: 'teknoloji' },
+// Spam / ilan filtresi
+const SPAM_KEYWORDS = [
+  'ihale', 'satın alma daire', 'müdürlüğü ilanı', 'ihalesi',
+  'şartname', 'teklif zarfı', 'resmi ilan', 'ilan no',
+];
+
+// Önem puanı için anahtar kelimeler
+const IMPORTANCE_KEYWORDS = {
+  'deprem': 30, 'sel': 20, 'yangın': 20, 'patlama': 25,
+  'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
+  'savaş': 25, 'saldırı': 20, 'kriz': 15,
+  'cumhurbaşkan': 15, 'meclis': 12, 'seçim': 15, 'hükümet': 10,
+  'merkez bankası': 15, 'faiz': 12, 'dolar': 10, 'borsa': 10, 'enflasyon': 12,
+  'şampiyon': 10, 'gol': 8, 'maç': 8,
+  'yapay zeka': 12, 'iphone': 10, 'tesla': 8,
 };
 
-const SPAM_KEYWORDS = ['ihale', 'satın alma', 'daire başkanlığı', 'müdürlüğü ilanı', 'ihalesi', 'şartname', 'teklif zarfı'];
-
 const cache = new Map();
+
+// HTML entity decode
+function decodeEntities(str) {
+  return (str || '')
+    .replace(/&#x27;/g, "'").replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+    .replace(/&#\d+;/g, '').trim();
+}
 
 function extractTag(xml, tag) {
   const match = xml.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i'));
   if (!match) return '';
-  return match[1].replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#\d+;/g,'').trim();
+  return decodeEntities(match[1].replace(/<[^>]+>/g, ''));
 }
 
 function parseRSS(xml, sourceName) {
@@ -59,20 +80,21 @@ function parseRSS(xml, sourceName) {
     const title = extractTag(content, 'title');
     const description = extractTag(content, 'description');
     const pubDate = extractTag(content, 'pubDate');
-    const link = extractTag(content, 'link') || content.match(/<link>([^<]+)<\/link>/i)?.[1] || '';
+    const link = extractTag(content, 'link') ||
+      content.match(/<link>([^<]+)<\/link>/i)?.[1] || '';
     if (title && title.length > 10) {
       items.push({ title, description, pubDate, link, source: sourceName });
     }
   }
-  return items.slice(0, 20);
+  return items.slice(0, 25);
 }
 
 async function fetchRSS(source) {
   const fetch = require('node-fetch');
   try {
     const res = await fetch(source.url, {
-      timeout: 6000,
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Haberimvar/1.0)' }
+      timeout: 7000,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Haberimvar/1.0; +https://haberimvar.app)' }
     });
     if (!res.ok) return [];
     const xml = await res.text();
@@ -83,8 +105,45 @@ async function fetchRSS(source) {
   }
 }
 
+function isSpam(title) {
+  const t = title.toLowerCase();
+  // Tamamen büyük harf = ilan
+  if (title.length > 15 && title === title.toUpperCase()) return true;
+  // Spam anahtar kelimeleri
+  if (SPAM_KEYWORDS.some(kw => t.includes(kw))) return true;
+  // Çok kısa başlık
+  if (title.length < 15) return true;
+  return false;
+}
+
+function scoreItem(item, location) {
+  const t = (item.title + ' ' + (item.description || '')).toLowerCase();
+  let score = 0;
+
+  // Önem kelimesi puanı
+  for (const [kw, pts] of Object.entries(IMPORTANCE_KEYWORDS)) {
+    if (t.includes(kw)) score += pts;
+  }
+
+  // Tazelik puanı
+  if (item.pubDate) {
+    const age = Date.now() - new Date(item.pubDate).getTime();
+    const ageHours = age / (1000 * 60 * 60);
+    if (ageHours < 1) score += 30;
+    else if (ageHours < 3) score += 20;
+    else if (ageHours < 6) score += 10;
+    else if (ageHours < 12) score += 5;
+  }
+
+  // Kaynak güvenilirlik puanı
+  if (item.source === 'NTV' || item.source === 'NTV Gündem') score += 5;
+  if (item.source === 'DW Türkçe') score += 5;
+
+  return score;
+}
+
 function guessCategory(title, desc, loc) {
-  const t = ((title || '') + ' ' + (desc || '')).toLowerCase();
+  const t = (title + ' ' + (desc || '')).toLowerCase();
   if (t.includes('borsa') || t.includes('dolar') || t.includes('faiz') || t.includes('enflasyon') || t.includes('merkez bankası')) return 'Ekonomi';
   if (t.includes('deprem')) return 'Deprem';
   if (t.includes('savaş') || t.includes('saldırı') || t.includes('ordu') || t.includes('asker')) return 'Güvenlik';
@@ -98,40 +157,48 @@ function guessCategory(title, desc, loc) {
   return 'Gündem';
 }
 
-async function fetchFromRSS(location) {
-  const sources = RSS_SOURCES[location] || [];
+async function fetchNews(location) {
+  const sources = RSS_SOURCES[location] || RSS_SOURCES['Turkiye'];
   const results = await Promise.allSettled(sources.map(fetchRSS));
   const allItems = results
     .filter(r => r.status === 'fulfilled')
     .flatMap(r => r.value);
 
-  console.log(`[RSS] ${location}: ${allItems.length} haber`);
-  if (allItems.length < 3) return null;
+  console.log(`[RSS] ${location}: ${allItems.length} ham haber`);
 
+  // Spam filtrele
+  const clean = allItems.filter(item => !isSpam(item.title));
+
+  // Tekrar eden başlıkları çıkar
   const seen = new Set();
   const sourceCounts = {};
-  const unique = allItems.filter(item => {
-    const key = item.title.slice(0, 30).toLowerCase();
+  const unique = clean.filter(item => {
+    const key = item.title.slice(0, 35).toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
     // Her kaynaktan max 4 haber
     sourceCounts[item.source] = (sourceCounts[item.source] || 0) + 1;
     if (sourceCounts[item.source] > 4) return false;
-    // Spam/ilan filtresi
-    const titleLower = item.title.toLowerCase();
-    if (SPAM_KEYWORDS.some(kw => titleLower.includes(kw))) return false;
     return true;
   });
 
-  const news = unique.slice(0, 10).map((item, i) => ({
+  // Önem puanına göre sırala
+  const sorted = unique
+    .map(item => ({ ...item, score: scoreItem(item, location) }))
+    .sort((a, b) => b.score - a.score);
+
+  console.log(`[RSS] ${location}: ${sorted.length} haber sıralandı, ilk 10 alınıyor`);
+
+  const news = sorted.slice(0, 10).map((item, i) => ({
     rank: i + 1,
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
     summary: item.description?.slice(0, 300) || 'Detaylar için habere tıklayın.',
-    isBreaking: false,
+    isBreaking: item.score > 40,
     sourceCount: 1,
     sources: [item.source],
     link: item.link,
+    score: item.score,
   }));
 
   return {
@@ -145,48 +212,6 @@ async function fetchFromRSS(location) {
   };
 }
 
-async function fetchFromGNews(location) {
-  const fetch = require('node-fetch');
-  const params = GNEWS_PARAMS[location] || GNEWS_PARAMS['Turkiye'];
-  let url = 'https://gnews.io/api/v4/top-headlines?lang=' + params.lang;
-  if (params.country) url += '&country=' + params.country;
-  if (params.q) url += '&q=' + encodeURIComponent(params.q);
-  url += '&max=10&apikey=' + GNEWS_KEY;
-
-  const res = await fetch(url, { timeout: 8000 });
-  if (!res.ok) throw new Error('GNews API hatası: ' + res.status);
-  const data = await res.json();
-  if (!data.articles?.length) throw new Error('Haber bulunamadı');
-
-  const news = data.articles.slice(0, 5).map((a, i) => ({
-    rank: i + 1,
-    category: guessCategory(a.title, a.description, location),
-    headline: a.title,
-    summary: a.description || 'Detaylar için habere tıklayın.',
-    isBreaking: false,
-    sourceCount: 1,
-    sources: [a.source?.name || 'Haber'],
-    link: a.url,
-  }));
-
-  return {
-    news,
-    articleCount: data.articles.length,
-    location,
-    updatedAt: Date.now(),
-    cacheAge: 0,
-    nextUpdateIn: 900,
-    source: 'gnews',
-  };
-}
-
-async function fetchNews(location) {
-  const rssData = await fetchFromRSS(location);
-  if (rssData) return rssData;
-  console.log(`[FALLBACK] ${location} GNews'e düşüyor`);
-  return await fetchFromGNews(location);
-}
-
 app.get('/api/news', async function(req, res) {
   const loc = req.query.loc || 'Turkiye';
   if (!LOCATIONS.includes(loc)) {
@@ -197,7 +222,7 @@ app.get('/api/news', async function(req, res) {
     return res.json({
       ...cached,
       cacheAge: Math.round((Date.now() - cached.updatedAt) / 1000),
-      nextUpdateIn: Math.max(0, Math.round((cached.updatedAt + 900000 - Date.now()) / 1000))
+      nextUpdateIn: Math.max(0, Math.round((cached.updatedAt + 900000 - Date.now()) / 1000)),
     });
   }
   try {
