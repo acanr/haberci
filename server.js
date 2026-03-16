@@ -9,78 +9,182 @@ app.use(express.static(path.join(__dirname, 'public')));
 const GNEWS_KEY = process.env.GNEWS_API_KEY;
 const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
+// RSS Kaynakları — kategori bazlı
+const RSS_SOURCES = {
+  'Turkiye': [
+    { name: 'NTV',      url: 'https://www.ntv.com.tr/son-dakika.rss' },
+    { name: 'Hürriyet', url: 'https://www.hurriyet.com.tr/rss/anasayfa' },
+    { name: 'Sözcü',    url: 'https://www.sozcu.com.tr/rss/anasayfa.xml' },
+  ],
+  'Dunya': [
+    { name: 'NTV Dünya',      url: 'https://www.ntv.com.tr/dunya.rss' },
+    { name: 'Hürriyet Dünya', url: 'https://www.hurriyet.com.tr/rss/dunya' },
+  ],
+  'Ekonomi': [
+    { name: 'NTV Ekonomi',      url: 'https://www.ntv.com.tr/ekonomi.rss' },
+    { name: 'Hürriyet Ekonomi', url: 'https://www.hurriyet.com.tr/rss/ekonomi' },
+  ],
+  'Spor': [
+    { name: 'NTV Spor',      url: 'https://www.ntv.com.tr/spor.rss' },
+    { name: 'Hürriyet Spor', url: 'https://www.hurriyet.com.tr/rss/spor' },
+  ],
+  'Teknoloji': [
+    { name: 'Webtekno',    url: 'https://www.webtekno.com/rss.xml' },
+    { name: 'ShiftDelete', url: 'https://shiftdelete.net/feed' },
+  ],
+};
+
+// GNews yedek parametreleri
 const GNEWS_PARAMS = {
- 'Turkiye': { lang: 'tr', country: 'tr', q: 'türkiye OR ankara OR erdoğan OR meclis OR hükümet OR tbmm' },
+  'Turkiye':   { lang: 'tr', country: 'tr', q: 'türkiye OR ankara OR erdoğan OR meclis OR hükümet OR tbmm' },
   'Dunya':     { lang: 'tr', q: 'dünya' },
   'Ekonomi':   { lang: 'tr', country: 'tr', q: 'ekonomi' },
   'Spor':      { lang: 'tr', country: 'tr', q: 'spor' },
   'Teknoloji': { lang: 'tr', country: 'tr', q: 'teknoloji' },
 };
 
-const LOC_DISPLAY = {
-  'Turkiye': 'Turkiye', 'Dunya': 'Dunya', 'Ekonomi': 'Ekonomi',
-  'Spor': 'Spor', 'Teknoloji': 'Teknoloji',
-};
-
 const cache = new Map();
 
-async function fetchNews(location) {
-  const fetch = require('node-fetch');
-  const params = GNEWS_PARAMS[location] || GNEWS_PARAMS['Turkiye'];
+// RSS parse yardımcı
+function extractTag(xml, tag) {
+  const match = xml.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i'));
+  if (!match) return '';
+  return match[1].replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#\d+;/g,'').trim();
+}
 
-  let url = 'https://gnews.io/api/v4/top-headlines?';
-  url += 'lang=' + params.lang;
-  if (params.country) url += '&country=' + params.country;
-  if (params.topic) url += '&topic=' + params.topic;
-  if (params.q) url += '&q=' + encodeURIComponent(params.q);
-  url += '&max=10';
-  url += '&apikey=' + GNEWS_KEY;
-
-  const res = await fetch(url, { timeout: 8000 });
-  if (!res.ok) throw new Error('GNews API hatasi: ' + res.status);
-  const data = await res.json();
-
-  if (!data.articles || data.articles.length === 0) {
-    throw new Error('Haber bulunamadi');
+function parseRSS(xml, sourceName) {
+  const items = [];
+  const matches = xml.matchAll(/<item[^>]*>([\s\S]*?)<\/item>/gi);
+  for (const match of matches) {
+    const content = match[1];
+    const title = extractTag(content, 'title');
+    const description = extractTag(content, 'description');
+    const pubDate = extractTag(content, 'pubDate');
+    const link = extractTag(content, 'link') || content.match(/<link>([^<]+)<\/link>/i)?.[1] || '';
+    if (title && title.length > 10) {
+      items.push({ title, description, pubDate, link, source: sourceName });
+    }
   }
+  return items.slice(0, 20);
+}
 
-  const news = data.articles.slice(0, 5).map(function(a, i) {
-    return {
-      rank: i + 1,
-      category: guessCategory(a.title, a.description, location),
-      headline: a.title,
-      summary: a.description || 'Detaylar icin habere tiklayin.',
-      isBreaking: false,
-      sourceCount: 1,
-      sources: [a.source ? a.source.name : 'Haber'],
-      link: a.url,
-    };
+async function fetchRSS(source) {
+  const fetch = require('node-fetch');
+  try {
+    const res = await fetch(source.url, {
+      timeout: 6000,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Haberimvar/1.0)' }
+    });
+    if (!res.ok) return [];
+    const xml = await res.text();
+    return parseRSS(xml, source.name);
+  } catch (err) {
+    console.warn(`[RSS] ${source.name} hata:`, err.message);
+    return [];
+  }
+}
+
+function guessCategory(title, desc, loc) {
+  const t = ((title || '') + ' ' + (desc || '')).toLowerCase();
+  if (t.includes('borsa') || t.includes('dolar') || t.includes('faiz') || t.includes('enflasyon') || t.includes('merkez bankası')) return 'Ekonomi';
+  if (t.includes('deprem')) return 'Deprem';
+  if (t.includes('savaş') || t.includes('saldırı') || t.includes('ordu') || t.includes('asker')) return 'Güvenlik';
+  if (t.includes('seçim') || t.includes('meclis') || t.includes('cumhurbaşkan') || t.includes('hükümet')) return 'Siyaset';
+  if (t.includes('maç') || t.includes('gol') || t.includes('futbol') || t.includes('şampiyon')) return 'Spor';
+  if (t.includes('yapay zeka') || t.includes('teknoloji') || t.includes('iphone') || t.includes('samsung')) return 'Teknoloji';
+  if (loc === 'Spor') return 'Spor';
+  if (loc === 'Ekonomi') return 'Ekonomi';
+  if (loc === 'Teknoloji') return 'Teknoloji';
+  if (loc === 'Dunya') return 'Dünya';
+  return 'Gündem';
+}
+
+async function fetchFromRSS(location) {
+  const sources = RSS_SOURCES[location] || [];
+  const results = await Promise.allSettled(sources.map(fetchRSS));
+  const allItems = results
+    .filter(r => r.status === 'fulfilled')
+    .flatMap(r => r.value);
+
+  console.log(`[RSS] ${location}: ${allItems.length} haber`);
+  if (allItems.length < 3) return null; // yetersizse GNews'e düş
+
+  // Tekrar eden haberleri filtrele, skora göre sırala
+  const seen = new Set();
+  const unique = allItems.filter(item => {
+    const key = item.title.slice(0, 30).toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
   });
 
+  const news = unique.slice(0, 5).map((item, i) => ({
+    rank: i + 1,
+    category: guessCategory(item.title, item.description, location),
+    headline: item.title,
+    summary: item.description?.slice(0, 300) || 'Detaylar için habere tıklayın.',
+    isBreaking: false,
+    sourceCount: 1,
+    sources: [item.source],
+    link: item.link,
+  }));
+
   return {
-    news: news,
-    articleCount: data.articles.length,
-    location: LOC_DISPLAY[location] || location,
+    news,
+    articleCount: allItems.length,
+    location,
     updatedAt: Date.now(),
     cacheAge: 0,
     nextUpdateIn: 900,
+    source: 'rss',
   };
+}
+
+async function fetchFromGNews(location) {
+  const fetch = require('node-fetch');
+  const params = GNEWS_PARAMS[location] || GNEWS_PARAMS['Turkiye'];
+  let url = 'https://gnews.io/api/v4/top-headlines?lang=' + params.lang;
+  if (params.country) url += '&country=' + params.country;
+  if (params.q) url += '&q=' + encodeURIComponent(params.q);
+  url += '&max=10&apikey=' + GNEWS_KEY;
+
+  const res = await fetch(url, { timeout: 8000 });
+  if (!res.ok) throw new Error('GNews API hatası: ' + res.status);
+  const data = await res.json();
+  if (!data.articles?.length) throw new Error('Haber bulunamadı');
+
+  const news = data.articles.slice(0, 5).map((a, i) => ({
+    rank: i + 1,
+    category: guessCategory(a.title, a.description, location),
+    headline: a.title,
+    summary: a.description || 'Detaylar için habere tıklayın.',
+    isBreaking: false,
+    sourceCount: 1,
+    sources: [a.source?.name || 'Haber'],
+    link: a.url,
+  }));
+
+  return { news, articleCount: data.articles.length, location, updatedAt: Date.now(), cacheAge: 0, nextUpdateIn: 900, source: 'gnews' };
+}
+
+async function fetchNews(location) {
+  // Önce RSS dene
+  const rssData = await fetchFromRSS(location);
+  if (rssData) return rssData;
+  // RSS yetersizse GNews
+  console.log(`[FALLBACK] ${location} GNews'e düşüyor`);
+  return await fetchFromGNews(location);
 }
 
 app.get('/api/news', async function(req, res) {
   const loc = req.query.loc || 'Turkiye';
-  if (LOCATIONS.indexOf(loc) === -1) {
-    return res.status(400).json({ error: 'Gecersiz lokasyon', received: loc });
+  if (!LOCATIONS.includes(loc)) {
+    return res.status(400).json({ error: 'Geçersiz lokasyon', received: loc });
   }
-
   const cached = cache.get(loc);
   if (cached && (Date.now() - cached.updatedAt) < 15 * 60 * 1000) {
-    return res.json(Object.assign({}, cached, {
-      cacheAge: Math.round((Date.now() - cached.updatedAt) / 1000),
-      nextUpdateIn: Math.max(0, Math.round((cached.updatedAt + 900000 - Date.now()) / 1000)),
-    }));
+    return res.json({ ...cached, cacheAge: Math.round((Date.now() - cached.updatedAt) / 1000), nextUpdateIn: Math.max(0, Math.round((cached.updatedAt + 900000 - Date.now()) / 1000)) });
   }
-
   try {
     const data = await fetchNews(loc);
     cache.set(loc, data);
@@ -94,9 +198,9 @@ app.get('/api/news', async function(req, res) {
 
 app.get('/api/status', function(req, res) {
   res.json({
-    locations: LOCATIONS.map(function(loc) {
+    locations: LOCATIONS.map(loc => {
       const c = cache.get(loc);
-      return { location: loc, cached: !!c, updatedAt: c ? new Date(c.updatedAt).toISOString() : null };
+      return { location: loc, cached: !!c, source: c?.source, updatedAt: c ? new Date(c.updatedAt).toISOString() : null };
     }),
     serverTime: new Date().toISOString(),
   });
@@ -105,19 +209,5 @@ app.get('/api/status', function(req, res) {
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
-function guessCategory(title, desc, loc) {
-  const t = ((title || '') + ' ' + (desc || '')).toLowerCase();
-  if (t.indexOf('borsa') !== -1 || t.indexOf('dolar') !== -1 || t.indexOf('faiz') !== -1 || t.indexOf('enflasyon') !== -1) return 'Ekonomi';
-  if (t.indexOf('deprem') !== -1) return 'Deprem';
-  if (t.indexOf('savas') !== -1 || t.indexOf('saldiri') !== -1 || t.indexOf('ordu') !== -1) return 'Guvenlik';
-  if (t.indexOf('secim') !== -1 || t.indexOf('meclis') !== -1 || t.indexOf('cumhurbaskani') !== -1) return 'Siyaset';
-  if (t.indexOf('mac') !== -1 || t.indexOf('gol') !== -1 || t.indexOf('futbol') !== -1) return 'Spor';
-  if (t.indexOf('yapay zeka') !== -1 || t.indexOf('teknoloji') !== -1 || t.indexOf('iphone') !== -1) return 'Teknoloji';
-  if (loc === 'Spor') return 'Spor';
-  if (loc === 'Ekonomi') return 'Ekonomi';
-  if (loc === 'Teknoloji') return 'Teknoloji';
-  return 'Gundem';
-}
 
 module.exports = app;
