@@ -37,10 +37,8 @@ const RSS_SOURCES = {
 };
 
 const SPAM_KEYWORDS = [
-  // İlan / ihale
   'ihale', 'satın alma daire', 'müdürlüğü ilanı', 'ihalesi',
   'şartname', 'teklif zarfı', 'resmi ilan', 'ilan no',
-  // Reklam / advertorial
   'tatil deneyimi', 'keşfedin', 'size özel', 'kampanya fırsatı',
   'sponsorlu', 'reklam', 'advertorial', 'brand', 'partner içerik',
   'fırsatı kaçırmayın', 'hemen satın al', 'indirim fırsatı',
@@ -53,16 +51,22 @@ const CLICKBAIT_KEYWORDS = [
   'işte o an', 'bakın ne oldu', 'şaşırtan', 'inanamayacaksınız',
 ];
 
+// ✅ DEĞİŞİKLİK 1: 'savaş' kaldırıldı, 'tutuklama' ve 'görevden alma' eklendi
+// ✅ DEĞİŞİKLİK 2: 'saldırı' +20 → +30
 const IMPORTANCE_KEYWORDS = {
   'deprem': 30, 'sel': 20, 'yangın': 20, 'patlama': 25,
   'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
-  'savaş': 25, 'saldırı': 20, 'kriz': 15,
+  'saldırı': 30, 'kriz': 15,                          // savaş kaldırıldı, saldırı +30
+  'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,   // yeni eklendi
+  'görevden alma': 20, 'görevden alındı': 20,          // yeni eklendi
+  'istifa': 15, 'ihraç': 15,                           // yeni eklendi (bağlantılı)
   'cumhurbaşkan': 15, 'meclis': 12, 'seçim': 15, 'hükümet': 10,
   'merkez bankası': 15, 'faiz': 12, 'dolar': 10, 'borsa': 10, 'enflasyon': 12,
   'şampiyon': 10, 'gol': 8, 'maç': 8,
   'yapay zeka': 12, 'iphone': 10, 'tesla': 8,
 };
 
+// ✅ DEĞİŞİKLİK 3: Spor cezası -20 → -10
 const SPOR_KEYWORDS = [
   'maç', 'gol', 'futbol', 'şampiyon', 'hat-trick', 'penaltı',
   'fenerbahçe', 'galatasaray', 'beşiktaş', 'trabzonspor',
@@ -201,10 +205,10 @@ function scoreItem(item, clusterSize, location) {
   // 4. Çoklu kaynak / cluster bonusu
   score += clusterBonus(clusterSize);
 
-  // 5. Gündem kategorisinde spor haberlerine ceza
+  // 5. Gündem kategorisinde spor haberlerine ceza (-10)
   if (location === 'Gundem') {
     const isSport = SPOR_KEYWORDS.some(kw => t.includes(kw));
-    if (isSport) score -= 20;
+    if (isSport) score -= 10;
   }
 
   return score;
@@ -215,6 +219,7 @@ function guessCategory(title, desc, loc) {
   if (t.includes('borsa') || t.includes('dolar') || t.includes('faiz') || t.includes('enflasyon') || t.includes('merkez bankası')) return 'Ekonomi';
   if (t.includes('deprem')) return 'Deprem';
   if (t.includes('savaş') || t.includes('saldırı') || t.includes('ordu') || t.includes('asker')) return 'Güvenlik';
+  if (t.includes('tutuklama') || t.includes('tutuklandı') || t.includes('gözaltı') || t.includes('görevden') || t.includes('istifa')) return 'Siyaset';
   if (t.includes('seçim') || t.includes('meclis') || t.includes('cumhurbaşkan') || t.includes('hükümet')) return 'Siyaset';
   if (t.includes('maç') || t.includes('gol') || t.includes('futbol') || t.includes('şampiyon')) return 'Spor';
   if (t.includes('yapay zeka') || t.includes('teknoloji') || t.includes('iphone') || t.includes('samsung')) return 'Teknoloji';
@@ -241,21 +246,11 @@ async function fetchNews(location) {
   const scored = clusters.map(cluster => {
     const size = cluster.items.length;
     const uniqueSources = [...new Set(cluster.items.map(i => i.source))];
-
-    // Temsilci: en taze haberi seç
     const representative = cluster.items.reduce((best, item) =>
       getItemAge(item) < getItemAge(best) ? item : best
     );
-
     const score = scoreItem(representative, size, location);
-
-    return {
-      ...representative,
-      score,
-      clusterSize: size,
-      sourceCount: uniqueSources.length,
-      allSources: uniqueSources,
-    };
+    return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
 
   const sorted = scored.sort((a, b) => b.score - a.score);
