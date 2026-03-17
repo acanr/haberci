@@ -37,8 +37,14 @@ const RSS_SOURCES = {
 };
 
 const SPAM_KEYWORDS = [
+  // İlan / ihale
   'ihale', 'satın alma daire', 'müdürlüğü ilanı', 'ihalesi',
   'şartname', 'teklif zarfı', 'resmi ilan', 'ilan no',
+  // Reklam / advertorial
+  'tatil deneyimi', 'keşfedin', 'size özel', 'kampanya fırsatı',
+  'sponsorlu', 'reklam', 'advertorial', 'brand', 'partner içerik',
+  'fırsatı kaçırmayın', 'hemen satın al', 'indirim fırsatı',
+  'ücretsiz deneyin', 'tıklayın ve kazanın',
 ];
 
 const CLICKBAIT_KEYWORDS = [
@@ -57,7 +63,6 @@ const IMPORTANCE_KEYWORDS = {
   'yapay zeka': 12, 'iphone': 10, 'tesla': 8,
 };
 
-// Gündem kategorisinde spor haberlerine ceza
 const SPOR_KEYWORDS = [
   'maç', 'gol', 'futbol', 'şampiyon', 'hat-trick', 'penaltı',
   'fenerbahçe', 'galatasaray', 'beşiktaş', 'trabzonspor',
