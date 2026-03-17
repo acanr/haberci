@@ -162,21 +162,33 @@ function clusterBonus(clusterSize) {
   return 0;
 }
 
+function getItemAge(item) {
+  if (!item.pubDate) return Infinity;
+  return Date.now() - new Date(item.pubDate).getTime();
+}
+
 function scoreItem(item, clusterSize) {
   const t = (item.title + ' ' + (item.description || '')).toLowerCase();
   let score = 0;
+
+  // 1. İçerik / önem kelimesi puanı
   for (const [kw, pts] of Object.entries(IMPORTANCE_KEYWORDS)) {
     if (t.includes(kw)) score += pts;
   }
-  if (item.pubDate) {
-    const ageHours = (Date.now() - new Date(item.pubDate).getTime()) / (1000 * 60 * 60);
-    if (ageHours < 1)       score += 30;
-    else if (ageHours < 3)  score += 20;
-    else if (ageHours < 6)  score += 10;
-    else if (ageHours < 12) score += 5;
-  }
+
+  // 2. Tazelik puanı
+  const ageHours = getItemAge(item) / (1000 * 60 * 60);
+  if (ageHours < 1)       score += 30;
+  else if (ageHours < 3)  score += 20;
+  else if (ageHours < 6)  score += 10;
+  else if (ageHours < 12) score += 5;
+
+  // 3. Kaynak ağırlığı
   score += Math.round((item.sourceWeight || 1.0) * 5);
+
+  // 4. Çoklu kaynak / cluster bonusu
   score += clusterBonus(clusterSize);
+
   return score;
 }
 
@@ -211,15 +223,25 @@ async function fetchNews(location) {
   const scored = clusters.map(cluster => {
     const size = cluster.items.length;
     const uniqueSources = [...new Set(cluster.items.map(i => i.source))];
+
+    // Temsilci: en taze haberi seç (en küçük age = en yeni)
     const representative = cluster.items.reduce((best, item) =>
-      (item.sourceWeight || 1) >= (best.sourceWeight || 1) ? item : best
+      getItemAge(item) < getItemAge(best) ? item : best
     );
+
     const score = scoreItem(representative, size);
-    return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
+
+    return {
+      ...representative,
+      score,
+      clusterSize: size,
+      sourceCount: uniqueSources.length,
+      allSources: uniqueSources,
+    };
   });
 
   const sorted = scored.sort((a, b) => b.score - a.score);
-  console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize} kaynak)`).join(' | ')}`);
+  console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize}src)`).join(' | ')}`);
 
   const news = sorted.slice(0, 10).map((item, i) => ({
     rank: i + 1,
