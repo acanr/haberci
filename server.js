@@ -57,6 +57,13 @@ const IMPORTANCE_KEYWORDS = {
   'yapay zeka': 12, 'iphone': 10, 'tesla': 8,
 };
 
+// Gündem kategorisinde spor haberlerine ceza
+const SPOR_KEYWORDS = [
+  'maç', 'gol', 'futbol', 'şampiyon', 'hat-trick', 'penaltı',
+  'fenerbahçe', 'galatasaray', 'beşiktaş', 'trabzonspor',
+  'süper lig', 'milli takım', 'teknik direktör', 'transfer',
+];
+
 const STOP_WORDS = new Set([
   've', 'ile', 'bir', 'bu', 'da', 'de', 'den', 'için', 'olan', 'veya',
   'ama', 'çok', 'en', 'mi', 'ne', 'ki', 'the', 'a', 'an', 'in', 'on',
@@ -167,7 +174,7 @@ function getItemAge(item) {
   return Date.now() - new Date(item.pubDate).getTime();
 }
 
-function scoreItem(item, clusterSize) {
+function scoreItem(item, clusterSize, location) {
   const t = (item.title + ' ' + (item.description || '')).toLowerCase();
   let score = 0;
 
@@ -188,6 +195,12 @@ function scoreItem(item, clusterSize) {
 
   // 4. Çoklu kaynak / cluster bonusu
   score += clusterBonus(clusterSize);
+
+  // 5. Gündem kategorisinde spor haberlerine ceza
+  if (location === 'Gundem') {
+    const isSport = SPOR_KEYWORDS.some(kw => t.includes(kw));
+    if (isSport) score -= 20;
+  }
 
   return score;
 }
@@ -224,12 +237,12 @@ async function fetchNews(location) {
     const size = cluster.items.length;
     const uniqueSources = [...new Set(cluster.items.map(i => i.source))];
 
-    // Temsilci: en taze haberi seç (en küçük age = en yeni)
+    // Temsilci: en taze haberi seç
     const representative = cluster.items.reduce((best, item) =>
       getItemAge(item) < getItemAge(best) ? item : best
     );
 
-    const score = scoreItem(representative, size);
+    const score = scoreItem(representative, size, location);
 
     return {
       ...representative,
