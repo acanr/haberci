@@ -121,7 +121,7 @@
 </div>
 <div class="controls-bar">
   <div class="loc-pills" id="pills">
-    <button class="pill active" data-loc="Türkiye">🇹🇷 Türkiye</button>
+    <button class="pill active" data-loc="Gündem">📰 Gündem</button>
     <button class="pill" data-loc="Dünya">🌍 Dünya</button>
     <button class="pill" data-loc="Ekonomi">📊 Ekonomi</button>
     <button class="pill" data-loc="Teknoloji">💻 Teknoloji</button>
@@ -153,7 +153,7 @@
 </div>
 <div class="toast" id="toast"></div>
 <script>
-let currentLoc = 'Türkiye';
+let currentLoc = 'Gündem';
 let nextUpdateSec = 900;
 let countdownInterval = null;
 
@@ -173,7 +173,7 @@ async function loadNews() {
   document.getElementById('main-content').innerHTML =
     `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
   try {
-    const locMap = {'Türkiye':'Turkiye','Dünya':'Dunya','Ekonomi':'Ekonomi','Spor':'Spor','Teknoloji':'Teknoloji'};
+    const locMap = {'Gündem':'Gundem','Dünya':'Dunya','Ekonomi':'Ekonomi','Spor':'Spor','Teknoloji':'Teknoloji'};
     const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
