@@ -6,34 +6,33 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const LOCATIONS = ['Turkiye', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
+const LOCATIONS = ['Gundem', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
 const RSS_SOURCES = {
-  'Turkiye': [
-    { name: 'NTV',       url: 'https://www.ntv.com.tr/gundem.rss',          weight: 1.2 },
-    { name: 'Hürriyet',  url: 'https://www.hurriyet.com.tr/rss/anasayfa',   weight: 1.0 },
-    { name: 'Sözcü',     url: 'https://www.sozcu.com.tr/rss/anasayfa.xml',  weight: 1.0 },
-    { name: 'DW Türkçe', url: 'https://rss.dw.com/rdf/rss-tur-all',         weight: 1.2 },
+  'Gundem': [
+    { name: 'NTV',      url: 'https://www.ntv.com.tr/gundem.rss',         weight: 1.2 },
+    { name: 'Hürriyet', url: 'https://www.hurriyet.com.tr/rss/anasayfa',  weight: 1.0 },
+    { name: 'Sözcü',    url: 'https://www.sozcu.com.tr/rss/anasayfa.xml', weight: 1.0 },
   ],
   'Dunya': [
-    { name: 'NTV Dünya',      url: 'https://www.ntv.com.tr/dunya.rss',            weight: 1.2 },
-    { name: 'Hürriyet Dünya', url: 'https://www.hurriyet.com.tr/rss/dunya',       weight: 1.0 },
-    { name: 'DW Türkçe',      url: 'https://rss.dw.com/rdf/rss-tur-all',          weight: 1.2 },
+    { name: 'NTV Dünya',      url: 'https://www.ntv.com.tr/dunya.rss',          weight: 1.2 },
+    { name: 'Hürriyet Dünya', url: 'https://www.hurriyet.com.tr/rss/dunya',     weight: 1.0 },
+    { name: 'DW Türkçe',      url: 'https://rss.dw.com/rdf/rss-tur-all',        weight: 1.2 },
   ],
   'Ekonomi': [
-    { name: 'NTV Ekonomi',      url: 'https://www.ntv.com.tr/ekonomi.rss',              weight: 1.2 },
-    { name: 'Hürriyet Ekonomi', url: 'https://www.hurriyet.com.tr/rss/ekonomi',         weight: 1.0 },
-    { name: 'Sözcü Ekonomi',    url: 'https://www.sozcu.com.tr/rss/ekonomi.xml',        weight: 1.0 },
+    { name: 'NTV Ekonomi',      url: 'https://www.ntv.com.tr/ekonomi.rss',          weight: 1.2 },
+    { name: 'Hürriyet Ekonomi', url: 'https://www.hurriyet.com.tr/rss/ekonomi',     weight: 1.0 },
+    { name: 'Sözcü Ekonomi',    url: 'https://www.sozcu.com.tr/rss/ekonomi.xml',    weight: 1.0 },
   ],
   'Spor': [
-    { name: 'NTV Gündem',    url: 'https://www.ntv.com.tr/gundem.rss',         weight: 1.0 },
-    { name: 'Hürriyet Spor', url: 'https://www.hurriyet.com.tr/rss/spor',     weight: 1.0 },
-    { name: 'Sözcü Spor',    url: 'https://www.sozcu.com.tr/rss/spor.xml',    weight: 1.0 },
+    { name: 'NTV Gündem',    url: 'https://www.ntv.com.tr/gundem.rss',      weight: 1.0 },
+    { name: 'Hürriyet Spor', url: 'https://www.hurriyet.com.tr/rss/spor',  weight: 1.0 },
+    { name: 'Sözcü Spor',    url: 'https://www.sozcu.com.tr/rss/spor.xml', weight: 1.0 },
   ],
   'Teknoloji': [
-    { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss',  weight: 1.2 },
-    { name: 'Webtekno',      url: 'https://www.webtekno.com/rss.xml',       weight: 1.0 },
-    { name: 'ShiftDelete',   url: 'https://shiftdelete.net/feed',           weight: 1.0 },
+    { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss', weight: 1.2 },
+    { name: 'Webtekno',      url: 'https://www.webtekno.com/rss.xml',      weight: 1.0 },
+    { name: 'ShiftDelete',   url: 'https://shiftdelete.net/feed',          weight: 1.0 },
   ],
 };
 
@@ -58,7 +57,6 @@ const IMPORTANCE_KEYWORDS = {
   'yapay zeka': 12, 'iphone': 10, 'tesla': 8,
 };
 
-// Cluster için stop words — bunlar ortak kelime sayılmaz
 const STOP_WORDS = new Set([
   've', 'ile', 'bir', 'bu', 'da', 'de', 'den', 'için', 'olan', 'veya',
   'ama', 'çok', 'en', 'mi', 'ne', 'ki', 'the', 'a', 'an', 'in', 'on',
@@ -124,7 +122,6 @@ function isSpam(title) {
   return false;
 }
 
-// Başlıktan anlamlı kelimeleri çıkar (cluster için)
 function getKeywords(title) {
   return title
     .toLowerCase()
@@ -133,39 +130,31 @@ function getKeywords(title) {
     .filter(w => w.length > 3 && !STOP_WORDS.has(w));
 }
 
-// İki başlık arasındaki ortak kelime sayısı
 function overlapCount(wordsA, wordsB) {
   const setB = new Set(wordsB);
   return wordsA.filter(w => setB.has(w)).length;
 }
 
-// Haberleri cluster'la — benzer başlıkları grupla
 function clusterNews(items) {
   const clusters = [];
-
   for (const item of items) {
     const words = getKeywords(item.title);
     let matched = false;
-
     for (const cluster of clusters) {
       if (overlapCount(words, cluster.keywords) >= 2) {
         cluster.items.push(item);
-        // Cluster keyword setini genişlet
         cluster.keywords = [...new Set([...cluster.keywords, ...words])];
         matched = true;
         break;
       }
     }
-
     if (!matched) {
       clusters.push({ keywords: words, items: [item] });
     }
   }
-
   return clusters;
 }
 
-// Cluster bazlı çakışma bonusu
 function clusterBonus(clusterSize) {
   if (clusterSize >= 4) return 75;
   if (clusterSize === 3) return 50;
@@ -176,13 +165,9 @@ function clusterBonus(clusterSize) {
 function scoreItem(item, clusterSize) {
   const t = (item.title + ' ' + (item.description || '')).toLowerCase();
   let score = 0;
-
-  // 1. İçerik / önem kelimesi puanı
   for (const [kw, pts] of Object.entries(IMPORTANCE_KEYWORDS)) {
     if (t.includes(kw)) score += pts;
   }
-
-  // 2. Tazelik puanı
   if (item.pubDate) {
     const ageHours = (Date.now() - new Date(item.pubDate).getTime()) / (1000 * 60 * 60);
     if (ageHours < 1)       score += 30;
@@ -190,13 +175,8 @@ function scoreItem(item, clusterSize) {
     else if (ageHours < 6)  score += 10;
     else if (ageHours < 12) score += 5;
   }
-
-  // 3. Kaynak ağırlığı
   score += Math.round((item.sourceWeight || 1.0) * 5);
-
-  // 4. Çoklu kaynak / cluster bonusu (A+C karışımı)
   score += clusterBonus(clusterSize);
-
   return score;
 }
 
@@ -216,7 +196,7 @@ function guessCategory(title, desc, loc) {
 }
 
 async function fetchNews(location) {
-  const sources = RSS_SOURCES[location] || RSS_SOURCES['Turkiye'];
+  const sources = RSS_SOURCES[location] || RSS_SOURCES['Gundem'];
   const results = await Promise.allSettled(sources.map(fetchRSS));
   const allItems = results
     .filter(r => r.status === 'fulfilled')
@@ -224,38 +204,22 @@ async function fetchNews(location) {
 
   console.log(`[RSS] ${location}: ${allItems.length} ham haber`);
 
-  // Spam filtrele
   const clean = allItems.filter(item => !isSpam(item.title));
-
-  // Cluster'la — benzer haberleri grupla
   const clusters = clusterNews(clean);
   console.log(`[CLUSTER] ${location}: ${clusters.length} cluster oluştu`);
 
-  // Her cluster'dan en iyi temsilciyi seç, puana cluster bonusunu ekle
   const scored = clusters.map(cluster => {
     const size = cluster.items.length;
     const uniqueSources = [...new Set(cluster.items.map(i => i.source))];
-
-    // Cluster içinden en yüksek kaynak ağırlıklı temsilciyi seç
     const representative = cluster.items.reduce((best, item) =>
       (item.sourceWeight || 1) >= (best.sourceWeight || 1) ? item : best
     );
-
     const score = scoreItem(representative, size);
-
-    return {
-      ...representative,
-      score,
-      clusterSize: size,
-      sourceCount: uniqueSources.length,
-      allSources: uniqueSources,
-    };
+    return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
 
-  // Puana göre sırala
   const sorted = scored.sort((a, b) => b.score - a.score);
-
-  console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}puan, ${i.clusterSize} kaynak)`).join(' | ')}`);
+  console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize} kaynak)`).join(' | ')}`);
 
   const news = sorted.slice(0, 10).map((item, i) => ({
     rank: i + 1,
@@ -282,7 +246,7 @@ async function fetchNews(location) {
 }
 
 app.get('/api/news', async function(req, res) {
-  const loc = req.query.loc || 'Turkiye';
+  const loc = req.query.loc || 'Gundem';
   if (!LOCATIONS.includes(loc)) {
     return res.status(400).json({ error: 'Geçersiz lokasyon', received: loc });
   }
