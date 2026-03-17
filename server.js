@@ -51,22 +51,19 @@ const CLICKBAIT_KEYWORDS = [
   'işte o an', 'bakın ne oldu', 'şaşırtan', 'inanamayacaksınız',
 ];
 
-// ✅ DEĞİŞİKLİK 1: 'savaş' kaldırıldı, 'tutuklama' ve 'görevden alma' eklendi
-// ✅ DEĞİŞİKLİK 2: 'saldırı' +20 → +30
 const IMPORTANCE_KEYWORDS = {
   'deprem': 30, 'sel': 20, 'yangın': 20, 'patlama': 25,
   'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
-  'saldırı': 30, 'kriz': 15,                          // savaş kaldırıldı, saldırı +30
-  'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,   // yeni eklendi
-  'görevden alma': 20, 'görevden alındı': 20,          // yeni eklendi
-  'istifa': 15, 'ihraç': 15,                           // yeni eklendi (bağlantılı)
+  'saldırı': 30, 'kriz': 10,                           // kriz: 15→10
+  'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,
+  'görevden alma': 20, 'görevden alındı': 20,
+  'istifa': 15, 'ihraç': 15,
   'cumhurbaşkan': 15, 'meclis': 12, 'seçim': 15, 'hükümet': 10,
   'merkez bankası': 15, 'faiz': 12, 'dolar': 10, 'borsa': 10, 'enflasyon': 12,
   'şampiyon': 10, 'gol': 8, 'maç': 8,
-  'yapay zeka': 12, 'iphone': 10, 'tesla': 8,
+  'yapay zeka': 0, 'iphone': 0, 'tesla': 0,           // yapay zeka: 12→0
 };
 
-// ✅ DEĞİŞİKLİK 3: Spor cezası -20 → -10
 const SPOR_KEYWORDS = [
   'maç', 'gol', 'futbol', 'şampiyon', 'hat-trick', 'penaltı',
   'fenerbahçe', 'galatasaray', 'beşiktaş', 'trabzonspor',
@@ -187,25 +184,19 @@ function scoreItem(item, clusterSize, location) {
   const t = (item.title + ' ' + (item.description || '')).toLowerCase();
   let score = 0;
 
-  // 1. İçerik / önem kelimesi puanı
   for (const [kw, pts] of Object.entries(IMPORTANCE_KEYWORDS)) {
     if (t.includes(kw)) score += pts;
   }
 
-  // 2. Tazelik puanı
   const ageHours = getItemAge(item) / (1000 * 60 * 60);
   if (ageHours < 1)       score += 30;
   else if (ageHours < 3)  score += 20;
   else if (ageHours < 6)  score += 10;
   else if (ageHours < 12) score += 5;
 
-  // 3. Kaynak ağırlığı
   score += Math.round((item.sourceWeight || 1.0) * 5);
-
-  // 4. Çoklu kaynak / cluster bonusu
   score += clusterBonus(clusterSize);
 
-  // 5. Gündem kategorisinde spor haberlerine ceza (-10)
   if (location === 'Gundem') {
     const isSport = SPOR_KEYWORDS.some(kw => t.includes(kw));
     if (isSport) score -= 10;
