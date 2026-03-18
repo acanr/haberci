@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>İletişim — Haberimvar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f0f0f; --ink-2: #444; --ink-3: #888; --ink-4: #bbb;
+      --surface: #fff; --surface-2: #f7f6f4;
+      --accent: #c0392b; --accent-soft: #f9ebe9;
+      --green: #1a7a4a; --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.15);
+      --radius: 14px; --radius-sm: 8px; --font-display: 'Playfair Display', Georgia, serif; --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--surface); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .nav-brand { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; }
+    .nav-brand span { color: var(--accent); }
+    .nav-back { font-size: 13px; color: var(--ink-3); text-decoration: none; }
+    .nav-back:hover { color: var(--ink); }
+    .page { max-width: 680px; margin: 0 auto; padding: 56px 24px 80px; }
+    .page-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .page-title { font-family: var(--font-display); font-size: clamp(28px,4vw,42px); font-weight: 600; line-height: 1.15; letter-spacing: -0.5px; margin-bottom: 12px; }
+    .page-sub { font-size: 15px; color: var(--ink-2); font-weight: 300; margin-bottom: 40px; line-height: 1.6; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+    .contact-card { background: var(--surface-2); border-radius: var(--radius); padding: 24px; }
+    .contact-card-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+    .contact-card-value { font-size: 15px; color: var(--ink); font-weight: 500; }
+    .contact-card-desc { font-size: 13px; color: var(--ink-3); margin-top: 4px; font-weight: 300; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-2); margin-bottom: 6px; }
+    .form-input { width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.15s; background: var(--surface); color: var(--ink); }
+    .form-input:focus { border-color: var(--ink); }
+    .form-textarea { width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); font-family: var(--font-body); font-size: 14px; outline: none; resize: vertical; min-height: 120px; transition: border-color 0.15s; background: var(--surface); color: var(--ink); }
+    .form-textarea:focus { border-color: var(--ink); }
+    .form-select { width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); font-family: var(--font-body); font-size: 14px; outline: none; background: var(--surface); color: var(--ink); }
+    .form-btn { width: 100%; padding: 12px; border-radius: var(--radius-sm); background: var(--ink); color: white; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: var(--font-body); transition: opacity 0.15s; }
+    .form-btn:hover { opacity: 0.85; }
+    .toast { display: none; background: #e8f5ee; border: 1px solid #9FE1CB; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 14px; color: var(--green); margin-top: 12px; }
+    .toast.show { display: block; }
+    @media(max-width:600px) { .page { padding: 32px 16px 60px; } .contact-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">haberim<span>var</span></a>
+  <a class="nav-back" href="/">← Ana sayfa</a>
+</nav>
+<div class="page">
+  <div class="page-eyebrow">Haberimvar</div>
+  <h1 class="page-title">İletişim</h1>
+  <p class="page-sub">Görüş, öneri veya işbirliği talepleriniz için bize ulaşabilirsiniz.</p>
+
+  <div class="contact-grid">
+    <div class="contact-card">
+      <div class="contact-card-label">E-posta</div>
+      <div class="contact-card-value">iletisim@haberimvar.app</div>
+      <div class="contact-card-desc">Genellikle 1-2 iş günü içinde yanıt veririz</div>
+    </div>
+    <div class="contact-card">
+      <div class="contact-card-label">Konum</div>
+      <div class="contact-card-value">Türkiye</div>
+      <div class="contact-card-desc">Tamamen dijital, uzaktan ekip</div>
+    </div>
+  </div>
+
+  <form onsubmit="handleSubmit(event)">
+    <div class="form-group">
+      <label class="form-label" for="name">Ad Soyad</label>
+      <input class="form-input" type="text" id="name" placeholder="Adınız" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="email">E-posta</label>
+      <input class="form-input" type="email" id="email" placeholder="ornek@email.com" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="subject">Konu</label>
+      <select class="form-select" id="subject">
+        <option value="">Konu seçin</option>
+        <option value="oneri">Öneri / Geri bildirim</option>
+        <option value="hata">Hata bildirimi</option>
+        <option value="isbirligi">İşbirliği teklifi</option>
+        <option value="basin">Basın / Medya</option>
+        <option value="diger">Diğer</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="message">Mesaj</label>
+      <textarea class="form-textarea" id="message" placeholder="Mesajınızı buraya yazın..." required></textarea>
+    </div>
+    <button class="form-btn" type="submit">Gönder</button>
+    <div class="toast" id="toast">✓ Mesajınız alındı, en kısa sürede yanıt vereceğiz.</div>
+  </form>
+</div>
+<script>
+  function handleSubmit(e) {
+    e.preventDefault();
+    document.getElementById('toast').classList.add('show');
+    e.target.reset();
+    setTimeout(() => document.getElementById('toast').classList.remove('show'), 5000);
+  }
+</script>
+</body>
+</html>
