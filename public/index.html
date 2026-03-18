@@ -8,50 +8,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #0f0f0f;
-      --ink-2: #444;
-      --ink-3: #888;
-      --ink-4: #bbb;
-      --surface: #fff;
-      --surface-2: #f7f6f4;
-      --surface-3: #eeece9;
-      --accent: #c0392b;
-      --accent-soft: #f9ebe9;
-      --green: #1a7a4a;
-      --green-soft: #e8f5ee;
-      --border: rgba(0,0,0,0.08);
-      --border-strong: rgba(0,0,0,0.15);
-      --radius: 14px;
-      --radius-sm: 8px;
+      --ink: #0f0f0f; --ink-2: #444; --ink-3: #888; --ink-4: #bbb;
+      --surface: #fff; --surface-2: #f7f6f4; --surface-3: #eeece9;
+      --accent: #c0392b; --accent-soft: #f9ebe9;
+      --green: #1a7a4a; --green-soft: #e8f5ee;
+      --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.15);
+      --radius: 14px; --radius-sm: 8px;
       --font-display: 'Playfair Display', Georgia, serif;
       --font-body: 'DM Sans', system-ui, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font-body); background: var(--surface); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,0.93);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px; gap: 12px;
-    }
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
     .nav-brand { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; flex-shrink: 0; }
     .nav-brand span { color: var(--accent); }
     .nav-right { display: flex; align-items: center; gap: 10px; }
     .nav-date { font-size: 13px; color: var(--ink-3); }
 
-    .nav-ticker {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      border-radius: 100px;
-      padding: 4px 12px;
-      font-size: 12px; font-weight: 500; color: var(--ink-2);
-      white-space: nowrap;
-    }
+    .nav-ticker { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 100px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
     .ticker-item { display: flex; align-items: center; gap: 4px; }
     .ticker-label { color: var(--ink-3); font-weight: 400; }
     .ticker-val { color: var(--ink); }
@@ -81,14 +56,7 @@
     .pill:hover { background: var(--surface-2); }
     .pill.active { background: var(--ink); color: white; border-color: var(--ink); }
 
-    .content-layout {
-      max-width: 1200px; margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 32px;
-      padding: 28px 24px 80px;
-      align-items: start;
-    }
+    .content-layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 300px; gap: 32px; padding: 28px 24px 80px; align-items: start; }
 
     .loading-wrap { display: flex; flex-direction: column; align-items: center; padding: 80px 0; gap: 16px; }
     .loader { width: 34px; height: 34px; border: 2px solid var(--border-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
@@ -108,12 +76,7 @@
     .news-summary { font-size: 13px; color: var(--ink-2); line-height: 1.65; font-weight: 300; }
 
     .news-footer { display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .source-chip {
-      display: flex; align-items: center; gap: 5px;
-      background: var(--surface-2); border: 1px solid var(--border);
-      border-radius: 100px; padding: 3px 8px 3px 4px;
-      font-size: 11px; color: var(--ink-2);
-    }
+    .source-chip { display: flex; align-items: center; gap: 5px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 100px; padding: 3px 8px 3px 4px; font-size: 11px; color: var(--ink-2); }
     .source-chip img { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; }
     .source-chip-more { font-size: 11px; color: var(--ink-4); padding: 3px 4px; }
     .time-badge { margin-left: auto; font-size: 11px; color: var(--ink-4); white-space: nowrap; }
@@ -122,17 +85,19 @@
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
 
+    /* SIDEBAR */
     .sidebar { position: sticky; top: 80px; }
     .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
     .sidebar-item { display: flex; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; text-decoration: none; }
     .sidebar-item:last-child { border-bottom: none; }
     .sidebar-item:hover { background: var(--surface-2); }
-    .sidebar-rank { font-family: var(--font-display); font-size: 18px; color: var(--ink-4); flex-shrink: 0; line-height: 1.2; min-width: 20px; }
     .sidebar-body { flex: 1; min-width: 0; }
-    .sidebar-headline { font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--ink); margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .sidebar-meta { font-size: 11px; color: var(--ink-4); display: flex; align-items: center; gap: 5px; }
-    .sidebar-source-logo { width: 12px; height: 12px; border-radius: 50%; object-fit: cover; }
+    .sidebar-source-row { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .sidebar-source-logo { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; }
+    .sidebar-source-name { font-size: 11px; font-weight: 500; color: var(--ink-2); }
+    .sidebar-headline { font-size: 13px; color: var(--ink); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .sidebar-time { font-size: 11px; color: var(--ink-4); margin-top: 3px; }
 
     .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
@@ -149,18 +114,8 @@
     .fade-in { animation: fadeIn 0.4s ease both; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
 
-    @media(max-width: 900px) {
-      .content-layout { grid-template-columns: 1fr; }
-      .sidebar { position: static; }
-    }
-    @media(max-width: 600px) {
-      .hero { padding: 28px 16px 20px; }
-      .controls-bar, .status-bar { padding: 12px 16px; }
-      .content-layout { padding: 20px 16px 60px; }
-      .news-card { padding: 18px 14px; gap: 14px; }
-      .nav-date { display: none; }
-      .nav-ticker { display: none; }
-    }
+    @media(max-width: 900px) { .content-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
+    @media(max-width: 600px) { .hero { padding: 28px 16px 20px; } .controls-bar, .status-bar { padding: 12px 16px; } .content-layout { padding: 20px 16px 60px; } .news-card { padding: 18px 14px; gap: 14px; } .nav-date { display: none; } .nav-ticker { display: none; } }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
@@ -179,8 +134,6 @@
     <span class="ticker-item"><span class="ticker-label">USD</span> <span class="ticker-val" id="t-usd">—</span></span>
     <span class="ticker-sep">·</span>
     <span class="ticker-item"><span class="ticker-label">EUR</span> <span class="ticker-val" id="t-eur">—</span></span>
-    <span class="ticker-sep">·</span>
-    <span class="ticker-item"><span class="ticker-label">ALTIN</span> <span class="ticker-val" id="t-gold">—</span></span>
   </div>
   <div class="nav-right">
     <span class="nav-date" id="nav-date"></span>
@@ -217,7 +170,7 @@
 
   <aside class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-title">🔥 Öne Çıkanlar</div>
+      <div class="sidebar-title">📰 Kaynaklarda Öne Çıkanlar</div>
       <div id="sidebar-list">
         <div style="padding:20px 16px;font-size:13px;color:var(--ink-4)">Yükleniyor...</div>
       </div>
@@ -335,18 +288,33 @@
 
   function renderSidebar(newsItems) {
     if (!newsItems?.length) return;
-    const top5 = [...newsItems].sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 5);
+
+    // Her kaynaktan en yüksek puanlı 1 haberi seç
+    const bySource = {};
+    newsItems.forEach(item => {
+      (item.sources || []).forEach(src => {
+        if (!bySource[src] || (item.score || 0) > (bySource[src].score || 0)) {
+          bySource[src] = { ...item, _displaySource: src };
+        }
+      });
+    });
+
+    // Puanlarına göre sırala, max 6 göster
+    const picks = Object.values(bySource)
+      .sort((a, b) => (b.score || 0) - (a.score || 0))
+      .slice(0, 6);
+
     let html = '';
-    top5.forEach((item, i) => {
+    picks.forEach(item => {
       const ago = timeAgo(item.pubDate);
-      const src = (item.sources?.[0]) || '';
+      const src = item._displaySource;
       const fav = faviconUrl(src);
       const imgTag = fav ? `<img class="sidebar-source-logo" src="${fav}" alt="" onerror="this.style.display='none'">` : '';
       html += `<a class="sidebar-item" href="${item.link || '#'}" target="_blank" rel="noopener">
-        <div class="sidebar-rank">${i + 1}</div>
         <div class="sidebar-body">
+          <div class="sidebar-source-row">${imgTag}<span class="sidebar-source-name">${src}</span></div>
           <div class="sidebar-headline">${item.headline}</div>
-          <div class="sidebar-meta">${imgTag}${src}${ago ? ' · ' + ago : ''}</div>
+          ${ago ? `<div class="sidebar-time">${ago}</div>` : ''}
         </div>
       </a>`;
     });
@@ -402,12 +370,6 @@
       if (data.rates?.EUR && usdTry) {
         document.getElementById('t-eur').textContent = (usdTry / data.rates.EUR).toFixed(2) + ' ₺';
       }
-    } catch(e) {}
-    try {
-      const res2 = await fetch('https://api.exchangerate-api.com/v4/latest/XAU');
-      const data2 = await res2.json();
-      const goldTry = data2.rates?.TRY;
-      if (goldTry) document.getElementById('t-gold').textContent = goldTry.toFixed(0) + ' ₺';
     } catch(e) {}
   }
 
