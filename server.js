@@ -10,9 +10,15 @@ const LOCATIONS = ['Gundem', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
 const RSS_SOURCES = {
   'Gundem': [
-    { name: 'NTV',      url: 'https://www.ntv.com.tr/gundem.rss',         weight: 1.2 },
-    { name: 'Hürriyet', url: 'https://www.hurriyet.com.tr/rss/anasayfa',  weight: 1.0 },
-    { name: 'Sözcü',    url: 'https://www.sozcu.com.tr/rss/anasayfa.xml', weight: 1.0 },
+    { name: 'NTV',        url: 'https://www.ntv.com.tr/gundem.rss',                      weight: 1.2 },
+    { name: 'Hürriyet',   url: 'https://www.hurriyet.com.tr/rss/gundem',                  weight: 1.0 },
+    { name: 'DW Türkçe',  url: 'https://rss.dw.com/rdf/rss-tur-all',                      weight: 1.2 },
+    { name: 'TRT Haber',  url: 'https://www.trthaber.com/sondakika.rss',                  weight: 1.2 },
+    { name: 'Sabah',      url: 'https://www.sabah.com.tr/rss/gundem.xml',                 weight: 1.0 },
+    { name: 'Sabah SD',   url: 'https://www.sabah.com.tr/rss/sondakika.xml',              weight: 1.0 },
+    { name: 'Milliyet',   url: 'https://www.milliyet.com.tr/rss/rssnew/sondakikarss.xml', weight: 1.0 },
+    { name: 'Cumhuriyet', url: 'https://www.cumhuriyet.com.tr/rss',                       weight: 1.0 },
+    { name: 'Haberturk',  url: 'https://www.haberturk.com/rss',                           weight: 1.0 },
   ],
   'Dunya': [
     { name: 'NTV Dünya',      url: 'https://www.ntv.com.tr/dunya.rss',          weight: 1.2 },
@@ -54,14 +60,14 @@ const CLICKBAIT_KEYWORDS = [
 const IMPORTANCE_KEYWORDS = {
   'deprem': 30, 'sel': 20, 'yangın': 20, 'patlama': 25,
   'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
-  'saldırı': 30, 'kriz': 10,                           // kriz: 15→10
+  'saldırı': 30, 'kriz': 10,
   'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,
   'görevden alma': 20, 'görevden alındı': 20,
   'istifa': 15, 'ihraç': 15,
   'cumhurbaşkan': 15, 'meclis': 12, 'seçim': 15, 'hükümet': 10,
   'merkez bankası': 15, 'faiz': 12, 'dolar': 10, 'borsa': 10, 'enflasyon': 12,
   'şampiyon': 10, 'gol': 8, 'maç': 8,
-  'yapay zeka': 0, 'iphone': 0, 'tesla': 0,           // yapay zeka: 12→0
+  'yapay zeka': 0, 'iphone': 10, 'tesla': 8,
 };
 
 const SPOR_KEYWORDS = [
@@ -99,7 +105,7 @@ function parseRSS(xml, source) {
   for (const match of matches) {
     const content = match[1];
     const title = extractTag(content, 'title');
-    const description = extractTag(content, 'description');
+    const description = extractTag(content, 'description') || extractTag(content, 'announce');
     const pubDate = extractTag(content, 'pubDate');
     const link = extractTag(content, 'link') ||
       content.match(/<link>([^<]+)<\/link>/i)?.[1] || '';
@@ -209,7 +215,7 @@ function guessCategory(title, desc, loc) {
   const t = (title + ' ' + (desc || '')).toLowerCase();
   if (t.includes('borsa') || t.includes('dolar') || t.includes('faiz') || t.includes('enflasyon') || t.includes('merkez bankası')) return 'Ekonomi';
   if (t.includes('deprem')) return 'Deprem';
-  if (t.includes('savaş') || t.includes('saldırı') || t.includes('ordu') || t.includes('asker')) return 'Güvenlik';
+  if (t.includes('saldırı') || t.includes('ordu') || t.includes('asker') || t.includes('füze')) return 'Güvenlik';
   if (t.includes('tutuklama') || t.includes('tutuklandı') || t.includes('gözaltı') || t.includes('görevden') || t.includes('istifa')) return 'Siyaset';
   if (t.includes('seçim') || t.includes('meclis') || t.includes('cumhurbaşkan') || t.includes('hükümet')) return 'Siyaset';
   if (t.includes('maç') || t.includes('gol') || t.includes('futbol') || t.includes('şampiyon')) return 'Spor';
