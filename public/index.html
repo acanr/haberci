@@ -36,6 +36,32 @@
     .nav-btn:hover { background: var(--surface-2); }
     .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid white; }
 
+    /* SEARCH */
+    .search-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: background 0.15s; }
+    .search-btn:hover { background: var(--surface-2); }
+    .search-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .search-overlay.open { opacity: 1; pointer-events: all; }
+    .search-box { position: fixed; top: 0; left: 0; right: 0; z-index: 201; background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 12px; transform: translateY(-100%); transition: transform 0.2s; }
+    .search-box.open { transform: translateY(0); }
+    .search-input { flex: 1; height: 44px; padding: 0 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); font-family: var(--font-body); font-size: 15px; outline: none; background: var(--surface-2); color: var(--ink); }
+    .search-input:focus { border-color: var(--ink); background: var(--surface); }
+    .search-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: none; cursor: pointer; font-size: 18px; color: var(--ink-3); display: flex; align-items: center; justify-content: center; font-family: var(--font-body); }
+    .search-results { position: fixed; top: 69px; left: 0; right: 0; bottom: 0; z-index: 201; overflow-y: auto; background: var(--surface); padding: 16px 24px 40px; }
+    .search-results-inner { max-width: 780px; margin: 0 auto; }
+    .search-meta { font-size: 13px; color: var(--ink-3); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .search-item { display: flex; flex-direction: column; gap: 4px; padding: 16px 0; border-bottom: 1px solid var(--border); cursor: pointer; text-decoration: none; }
+    .search-item:hover .search-item-title { color: var(--accent); }
+    .search-item-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .search-item-cat { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 2px 7px; border-radius: 4px; }
+    .search-item-source { font-size: 11px; color: var(--ink-3); display: flex; align-items: center; gap: 4px; }
+    .search-item-source img { width: 12px; height: 12px; border-radius: 50%; }
+    .search-item-time { font-size: 11px; color: var(--ink-4); margin-left: auto; }
+    .search-item-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.3; color: var(--ink); transition: color 0.15s; }
+    .search-item-summary { font-size: 13px; color: var(--ink-2); line-height: 1.6; font-weight: 300; }
+    .search-highlight { background: #fff3cd; border-radius: 2px; padding: 0 2px; }
+    .search-empty { text-align: center; padding: 60px 0; color: var(--ink-3); font-size: 15px; }
+    .search-loading { text-align: center; padding: 40px 0; color: var(--ink-3); font-size: 14px; }
+
     .hero { padding: 48px 24px 28px; max-width: 1200px; margin: 0 auto; border-bottom: 1px solid var(--border); }
     .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
     .hero-title { font-family: var(--font-display); font-size: clamp(30px,5vw,50px); font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin-bottom: 14px; }
@@ -74,18 +100,15 @@
     .src-badge { font-size: 11px; color: var(--ink-3); }
     .news-headline { font-family: var(--font-display); font-size: 23px; font-weight: 600; line-height: 1.35; color: var(--ink); margin-bottom: 8px; }
     .news-summary { font-size: 13px; color: var(--ink-2); line-height: 1.65; font-weight: 300; }
-
     .news-footer { display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
     .source-chip { display: flex; align-items: center; gap: 5px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 100px; padding: 3px 8px 3px 4px; font-size: 11px; color: var(--ink-2); }
     .source-chip img { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; }
     .source-chip-more { font-size: 11px; color: var(--ink-4); padding: 3px 4px; }
     .time-badge { margin-left: auto; font-size: 11px; color: var(--ink-4); white-space: nowrap; }
-
     .news-arrow { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink-3); align-self: center; transition: all 0.15s; }
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
 
-    /* SIDEBAR */
     .sidebar { position: sticky; top: 80px; }
     .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
@@ -115,7 +138,7 @@
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
 
     @media(max-width: 900px) { .content-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
-    @media(max-width: 600px) { .hero { padding: 28px 16px 20px; } .controls-bar, .status-bar { padding: 12px 16px; } .content-layout { padding: 20px 16px 60px; } .news-card { padding: 18px 14px; gap: 14px; } .nav-date { display: none; } .nav-ticker { display: none; } }
+    @media(max-width: 600px) { .hero { padding: 28px 16px 20px; } .controls-bar, .status-bar { padding: 12px 16px; } .content-layout { padding: 20px 16px 60px; } .news-card { padding: 18px 14px; gap: 14px; } .nav-date { display: none; } .nav-ticker { display: none; } .search-results { padding: 12px 16px 40px; } }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
@@ -128,6 +151,16 @@
 </head>
 <body>
 
+<!-- SEARCH UI -->
+<div class="search-overlay" id="search-overlay" onclick="closeSearch()"></div>
+<div class="search-box" id="search-box">
+  <input class="search-input" id="search-input" type="text" placeholder="Haber ara... (deprem, faiz, Erdoğan...)" autocomplete="off" />
+  <button class="search-close" onclick="closeSearch()">✕</button>
+</div>
+<div class="search-results" id="search-results" style="display:none;">
+  <div class="search-results-inner" id="search-results-inner"></div>
+</div>
+
 <nav>
   <a class="nav-brand" href="#">haberim<span>var</span></a>
   <div class="nav-ticker">
@@ -137,6 +170,7 @@
   </div>
   <div class="nav-right">
     <span class="nav-date" id="nav-date"></span>
+    <button class="search-btn" onclick="openSearch()" title="Haber ara">🔍</button>
     <button class="nav-btn" onclick="openModal()">🔔<span class="notif-dot"></span></button>
   </div>
 </nav>
@@ -167,7 +201,6 @@
   <main id="main-content">
     <div class="loading-wrap"><div class="loader"></div><div class="loading-label">Haberler yükleniyor...</div></div>
   </main>
-
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-title">📰 Kaynaklarda Öne Çıkanlar</div>
@@ -190,10 +223,18 @@
 
 <div class="toast" id="toast"></div>
 
+<footer style="border-top:1px solid rgba(0,0,0,0.08);padding:20px 24px;text-align:center;font-size:12px;color:#888;font-family:'DM Sans',system-ui,sans-serif;margin-top:20px;">
+  <a href="/hakkimizda" style="color:#888;text-decoration:none;margin:0 10px;">Hakkımızda</a>
+  <a href="/iletisim" style="color:#888;text-decoration:none;margin:0 10px;">İletişim</a>
+  <a href="/gizlilik" style="color:#888;text-decoration:none;margin:0 10px;">Gizlilik Politikası</a>
+  <span style="margin:0 10px;">© 2026 haberimvar.app</span>
+</footer>
+
 <script>
   let currentLoc = 'Gündem';
   let nextUpdateSec = 900;
   let countdownInterval = null;
+  let searchTimeout = null;
 
   const SOURCE_DOMAINS = {
     'NTV': 'ntv.com.tr', 'NTV Dünya': 'ntv.com.tr', 'NTV Gündem': 'ntv.com.tr', 'NTV Teknoloji': 'ntv.com.tr',
@@ -210,19 +251,24 @@
     return domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32` : null;
   }
 
-function timeAgo(pubDate) {
-  if (!pubDate) return null;
-  // Fazladan boşlukları temizle: "  Z" → "Z", "  +0300" → "+0300"
-  const cleaned = pubDate.trim().replace(/\s{2,}/g, ' ').replace(/\s+Z$/i, 'Z');
-  const date = new Date(cleaned);
-  if (isNaN(date.getTime())) return null;
-  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
-  if (mins < 1) return 'Az önce';
-  if (mins < 60) return `${mins} dk önce`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} saat önce`;
-  return `${Math.floor(hours / 24)} gün önce`;
-}
+  function timeAgo(pubDate) {
+    if (!pubDate) return null;
+    const cleaned = pubDate.trim().replace(/\s{2,}/g, ' ').replace(/\s+Z$/i, 'Z');
+    const date = new Date(cleaned);
+    if (isNaN(date.getTime())) return null;
+    const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+    if (mins < 1) return 'Az önce';
+    if (mins < 60) return `${mins} dk önce`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours} saat önce`;
+    return `${Math.floor(hours / 24)} gün önce`;
+  }
+
+  function highlight(text, q) {
+    if (!q || !text) return text;
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="search-highlight">$1</mark>');
+  }
 
   document.getElementById('nav-date').textContent = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -234,6 +280,72 @@ function timeAgo(pubDate) {
     currentLoc = pill.dataset.loc;
     loadNews();
   });
+
+  // SEARCH
+  function openSearch() {
+    document.getElementById('search-overlay').classList.add('open');
+    document.getElementById('search-box').classList.add('open');
+    document.getElementById('search-results').style.display = 'block';
+    document.getElementById('search-results-inner').innerHTML = '<div class="search-empty">Ne aramak istiyorsunuz?</div>';
+    setTimeout(() => document.getElementById('search-input').focus(), 200);
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').classList.remove('open');
+    document.getElementById('search-box').classList.remove('open');
+    document.getElementById('search-results').style.display = 'none';
+    document.getElementById('search-input').value = '';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    const q = this.value.trim();
+    if (q.length < 2) {
+      document.getElementById('search-results-inner').innerHTML = '<div class="search-empty">En az 2 karakter girin</div>';
+      return;
+    }
+    document.getElementById('search-results-inner').innerHTML = '<div class="search-loading">Aranıyor...</div>';
+    searchTimeout = setTimeout(() => doSearch(q), 300);
+  });
+
+  document.getElementById('search-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  async function doSearch(q) {
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      renderSearchResults(data, q);
+    } catch(e) {
+      document.getElementById('search-results-inner').innerHTML = '<div class="search-empty">Arama sırasında bir hata oluştu.</div>';
+    }
+  }
+
+  function renderSearchResults(data, q) {
+    const inner = document.getElementById('search-results-inner');
+    if (!data.results?.length) {
+      inner.innerHTML = `<div class="search-meta">"${q}" için sonuç bulunamadı</div><div class="search-empty">Farklı bir arama terimi deneyin</div>`;
+      return;
+    }
+    let html = `<div class="search-meta">"${q}" için <strong>${data.count}</strong> sonuç bulundu</div>`;
+    data.results.forEach(item => {
+      const ago = timeAgo(item.pubDate);
+      const src = (item.sources?.[0]) || '';
+      const fav = faviconUrl(src);
+      const imgTag = fav ? `<img src="${fav}" alt="" onerror="this.style.display='none'">` : '';
+      html += `<a class="search-item" href="${item.link || '#'}" target="_blank" rel="noopener">
+        <div class="search-item-meta">
+          <span class="search-item-cat">${item.category}</span>
+          <span class="search-item-source">${imgTag}${src}</span>
+          ${ago ? `<span class="search-item-time">${ago}</span>` : ''}
+        </div>
+        <div class="search-item-title">${highlight(item.headline, q)}</div>
+        ${item.summary ? `<div class="search-item-summary">${highlight(item.summary.slice(0, 150), q)}...</div>` : ''}
+      </a>`;
+    });
+    inner.innerHTML = html;
+  }
 
   async function loadNews() {
     setStatus('updating', 'Güncelleniyor...');
@@ -269,7 +381,6 @@ function timeAgo(pubDate) {
       }).join('');
       const extraChip = extraCount > 0 ? `<span class="source-chip-more">+${extraCount}</span>` : '';
       const timeChip = ago ? `<span class="time-badge">${ago}</span>` : '';
-
       html += `<button class="news-card fade-in" style="animation-delay:${i*40}ms" onclick="openNews(${i})">
         <div class="rank-num">${rankStr(item)}</div>
         <div class="news-body">
@@ -292,8 +403,6 @@ function timeAgo(pubDate) {
 
   function renderSidebar(newsItems) {
     if (!newsItems?.length) return;
-
-    // Her kaynaktan en yüksek puanlı 1 haberi seç
     const bySource = {};
     newsItems.forEach(item => {
       (item.sources || []).forEach(src => {
@@ -302,12 +411,7 @@ function timeAgo(pubDate) {
         }
       });
     });
-
-    // Puanlarına göre sırala, max 6 göster
-    const picks = Object.values(bySource)
-      .sort((a, b) => (b.score || 0) - (a.score || 0))
-      .slice(0, 6);
-
+    const picks = Object.values(bySource).sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 6);
     let html = '';
     picks.forEach(item => {
       const ago = timeAgo(item.pubDate);
@@ -382,13 +486,5 @@ function timeAgo(pubDate) {
   loadNews();
   setInterval(loadNews, 15 * 60 * 1000);
 </script>
-
-<footer style="border-top:1px solid rgba(0,0,0,0.08);padding:20px 24px;text-align:center;font-size:12px;color:#888;font-family:'DM Sans',system-ui,sans-serif;margin-top:20px;">
-  <a href="/hakkimizda" style="color:#888;text-decoration:none;margin:0 10px;">Hakkımızda</a>
-  <a href="/iletisim" style="color:#888;text-decoration:none;margin:0 10px;">İletişim</a>
-  <a href="/gizlilik" style="color:#888;text-decoration:none;margin:0 10px;">Gizlilik Politikası</a>
-  <span style="margin:0 10px;">© 2026 haberimvar.app</span>
-</footer>
-
 </body>
 </html>
