@@ -174,8 +174,8 @@ function clusterNews(items) {
 }
 
 function clusterBonus(clusterSize) {
-  if (clusterSize >= 4) return 75;
-  if (clusterSize === 3) return 50;
+  if (clusterSize >= 4) return 50;
+  if (clusterSize === 3) return 40;
   if (clusterSize === 2) return 25;
   return 0;
 }
