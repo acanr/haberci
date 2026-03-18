@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hakkımızda — Haberimvar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f0f0f; --ink-2: #444; --ink-3: #888; --ink-4: #bbb;
+      --surface: #fff; --surface-2: #f7f6f4;
+      --accent: #c0392b; --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.15);
+      --radius: 14px; --font-display: 'Playfair Display', Georgia, serif; --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--surface); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .nav-brand { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; }
+    .nav-brand span { color: var(--accent); }
+    .nav-back { font-size: 13px; color: var(--ink-3); text-decoration: none; }
+    .nav-back:hover { color: var(--ink); }
+    .page { max-width: 680px; margin: 0 auto; padding: 56px 24px 80px; }
+    .page-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .page-title { font-family: var(--font-display); font-size: clamp(28px,4vw,42px); font-weight: 600; line-height: 1.15; letter-spacing: -0.5px; margin-bottom: 32px; }
+    .page-body { font-size: 16px; color: var(--ink-2); line-height: 1.8; font-weight: 300; }
+    .page-body p { margin-bottom: 20px; }
+    .page-body h2 { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); margin: 36px 0 12px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 32px 0; }
+    .stat-card { background: var(--surface-2); border-radius: var(--radius); padding: 20px; text-align: center; }
+    .stat-num { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--ink); }
+    .stat-label { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+    @media(max-width:600px) { .page { padding: 32px 16px 60px; } .stat-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">haberim<span>var</span></a>
+  <a class="nav-back" href="/">← Ana sayfa</a>
+</nav>
+<div class="page">
+  <div class="page-eyebrow">Haberimvar</div>
+  <h1 class="page-title">Hakkımızda</h1>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-num">150+</div><div class="stat-label">Taranan haber / güncelleme</div></div>
+    <div class="stat-card"><div class="stat-num">9</div><div class="stat-label">Haber kaynağı</div></div>
+    <div class="stat-card"><div class="stat-num">15 dk</div><div class="stat-label">Güncelleme sıklığı</div></div>
+  </div>
+
+  <div class="page-body">
+    <p>Haberimvar, Türkiye'nin önde gelen haber kaynaklarını tarayarak günün en önemli haberlerini size sunan yapay zeka destekli bir haber özet platformudur.</p>
+
+    <h2>Nasıl çalışır?</h2>
+    <p>Her 15 dakikada bir NTV, Hürriyet, TRT Haber, Milliyet, Cumhuriyet, Sabah, Haberturk ve diğer güvenilir kaynaklardan 150'den fazla haber toplanır. Haberler; tazelik, önem ve kaynak çeşitliliği gibi kriterlere göre puanlanarak sıralanır ve günün en önemli 10 haberi seçilir.</p>
+
+    <p>Aynı konuyu birden fazla kaynaktan takip eden haberler bir arada gruplanır. Böylece tek bir konuya hangi kaynakların yer verdiğini kolayca görebilirsiniz.</p>
+
+    <h2>Misyonumuz</h2>
+    <p>Haberlerin gürültüsünü azaltmak, okuyucuya zaman kazandırmak ve günün gerçek anlamda önemli gelişmelerini ön plana çıkarmak için yola çıktık. Haberimvar reklam odaklı değil, okuyucu odaklı bir yaklaşımla tasarlanmıştır.</p>
+
+    <h2>İçerik politikası</h2>
+    <p>Haberimvar orijinal haber üretmez; yalnızca mevcut haber kaynaklarından derleme yapar. Tüm haberler ilgili kaynağa yönlendirme ile sunulur. Yayıncı haklarına saygı göstermek temel ilkelerimizden biridir.</p>
+  </div>
+</div>
+</body>
+</html>
