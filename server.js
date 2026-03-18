@@ -98,6 +98,13 @@ function extractTag(xml, tag) {
   return decodeEntities(match[1].replace(/<[^>]+>/g, ''));
 }
 
+// content:encoded ham HTML döndürür — entity decode ama tag'leri temizleme
+function extractFullContent(xml) {
+  const match = xml.match(/<content:encoded[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/content:encoded>/i);
+  if (!match) return '';
+  return decodeEntities(match[1]).trim();
+}
+
 function parseRSS(xml, source) {
   const items = [];
   const matches = xml.matchAll(/<item[^>]*>([\s\S]*?)<\/item>/gi);
@@ -105,11 +112,12 @@ function parseRSS(xml, source) {
     const content = match[1];
     const title = extractTag(content, 'title');
     const description = extractTag(content, 'description') || extractTag(content, 'announce');
+    const fullContent = extractFullContent(content); // ← yeni
     const pubDate = extractTag(content, 'pubDate');
     const link = extractTag(content, 'link') ||
       content.match(/<link>([^<]+)<\/link>/i)?.[1] || '';
     if (title && title.length > 10) {
-      items.push({ title, description, pubDate, link, source: source.name, sourceWeight: source.weight });
+      items.push({ title, description, fullContent, pubDate, link, source: source.name, sourceWeight: source.weight });
     }
   }
   return items.slice(0, 25);
@@ -251,7 +259,6 @@ async function fetchNews(location) {
     return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
 
-  // Ekonomi kategorisinde kronolojik sıralama (yeniden eskiye)
   const sorted = location === 'Ekonomi'
     ? scored.sort((a, b) => getItemAge(a) - getItemAge(b))
     : scored.sort((a, b) => b.score - a.score);
@@ -262,7 +269,8 @@ async function fetchNews(location) {
     rank: i + 1,
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
-    summary: item.description?.slice(0, 300) || 'Detaylar için habere tıklayın.',
+    summary: item.description?.slice(0, 300) || '',
+    fullContent: item.fullContent || '',  // ← yeni
     isBreaking: item.score > 50,
     sourceCount: item.sourceCount,
     sources: item.allSources,
