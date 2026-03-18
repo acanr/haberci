@@ -242,10 +242,13 @@ async function fetchNews(location) {
   const allItems = results
     .filter(r => r.status === 'fulfilled')
     .flatMap(r => r.value);
+
   console.log(`[RSS] ${location}: ${allItems.length} ham haber`);
+
   const clean = allItems.filter(item => !isSpam(item.title));
   const clusters = clusterNews(clean);
   console.log(`[CLUSTER] ${location}: ${clusters.length} cluster oluştu`);
+
   const scored = clusters.map(cluster => {
     const size = cluster.items.length;
     const uniqueSources = [...new Set(cluster.items.map(i => i.source))];
@@ -255,10 +258,14 @@ async function fetchNews(location) {
     const score = scoreItem(representative, size, location);
     return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
+
   const sorted = location === 'Ekonomi'
     ? scored.sort((a, b) => getItemAge(a) - getItemAge(b))
     : scored.sort((a, b) => b.score - a.score);
+
   console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize}src)`).join(' | ')}`);
+
+  // Top 10 kullanıcıya gösterilir
   const news = sorted.slice(0, 10).map((item, i) => ({
     rank: i + 1,
     category: guessCategory(item.title, item.description, location),
@@ -271,8 +278,24 @@ async function fetchNews(location) {
     score: item.score,
     pubDate: item.pubDate,
   }));
+
+  // Tüm haberler search için cache'e kaydedilir (max 100)
+  const allNews = sorted.slice(0, 100).map(item => ({
+    category: guessCategory(item.title, item.description, location),
+    headline: item.title,
+    summary: item.description?.slice(0, 300) || '',
+    isBreaking: item.score > 50,
+    sourceCount: item.sourceCount,
+    sources: item.allSources,
+    link: item.link,
+    score: item.score,
+    pubDate: item.pubDate,
+    location,
+  }));
+
   return {
     news,
+    allNews,
     articleCount: allItems.length,
     clusterCount: clusters.length,
     location,
@@ -305,6 +328,38 @@ app.get('/api/news', async function(req, res) {
     if (cached) return res.json(cached);
     res.status(503).json({ error: err.message });
   }
+});
+
+// SEARCH endpoint — tüm kategorilerdeki cache'li haberler içinde arama
+app.get('/api/search', async function(req, res) {
+  const q = (req.query.q || '').toLowerCase().trim();
+  if (!q || q.length < 2) {
+    return res.status(400).json({ error: 'En az 2 karakter girin', results: [] });
+  }
+
+  const results = [];
+  const seen = new Set();
+
+  for (const loc of LOCATIONS) {
+    const cached = cache.get(loc);
+    if (!cached?.allNews) continue;
+    for (const item of cached.allNews) {
+      const text = (item.headline + ' ' + item.summary).toLowerCase();
+      if (text.includes(q) && !seen.has(item.headline)) {
+        seen.add(item.headline);
+        results.push(item);
+      }
+    }
+  }
+
+  // Skora göre sırala
+  results.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+  res.json({
+    query: q,
+    count: results.length,
+    results: results.slice(0, 50),
+  });
 });
 
 app.get('/api/status', function(req, res) {
