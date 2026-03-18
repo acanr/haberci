@@ -8,47 +8,93 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #0f0f0f; --ink-2: #444; --ink-3: #888; --ink-4: #bbb;
-      --surface: #fff; --surface-2: #f7f6f4; --surface-3: #eeece9;
-      --accent: #c0392b; --accent-soft: #f9ebe9;
-      --green: #1a7a4a; --green-soft: #e8f5ee;
-      --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.15);
-      --radius: 14px; --radius-sm: 8px;
+      --ink: #0f0f0f;
+      --ink-2: #444;
+      --ink-3: #888;
+      --ink-4: #bbb;
+      --surface: #fff;
+      --surface-2: #f7f6f4;
+      --surface-3: #eeece9;
+      --accent: #c0392b;
+      --accent-soft: #f9ebe9;
+      --green: #1a7a4a;
+      --green-soft: #e8f5ee;
+      --border: rgba(0,0,0,0.08);
+      --border-strong: rgba(0,0,0,0.15);
+      --radius: 14px;
+      --radius-sm: 8px;
       --font-display: 'Playfair Display', Georgia, serif;
       --font-body: 'DM Sans', system-ui, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font-body); background: var(--surface); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
-    .nav-brand { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.93);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; gap: 12px;
+    }
+    .nav-brand { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; flex-shrink: 0; }
     .nav-brand span { color: var(--accent); }
-    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
     .nav-date { font-size: 13px; color: var(--ink-3); }
+
+    .nav-ticker {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 100px;
+      padding: 4px 12px;
+      font-size: 12px; font-weight: 500; color: var(--ink-2);
+      white-space: nowrap;
+    }
+    .ticker-item { display: flex; align-items: center; gap: 4px; }
+    .ticker-label { color: var(--ink-3); font-weight: 400; }
+    .ticker-val { color: var(--ink); }
+    .ticker-sep { color: var(--border-strong); }
+
     .nav-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: background 0.15s; position: relative; }
     .nav-btn:hover { background: var(--surface-2); }
     .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid white; }
-    .hero { padding: 48px 24px 28px; max-width: 900px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+
+    .hero { padding: 48px 24px 28px; max-width: 1200px; margin: 0 auto; border-bottom: 1px solid var(--border); }
     .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
     .hero-title { font-family: var(--font-display); font-size: clamp(30px,5vw,50px); font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin-bottom: 14px; }
     .hero-title em { font-style: italic; color: var(--ink-2); }
     .hero-sub { font-size: 15px; color: var(--ink-2); line-height: 1.6; max-width: 500px; font-weight: 300; }
-    .status-bar { max-width: 900px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+
+    .status-bar { max-width: 1200px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; transition: background 0.3s; }
     .status-dot.live { background: var(--green); animation: pulse 2s ease infinite; }
     .status-dot.updating { background: #f39c12; animation: pulse 0.6s ease infinite; }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
     .status-text { font-size: 12px; color: var(--ink-3); }
     .next-update { margin-left: auto; font-size: 12px; color: var(--ink-4); }
-    .controls-bar { max-width: 900px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
+
+    .controls-bar { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
     .loc-pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
     .pill { padding: 7px 16px; border-radius: 100px; font-size: 13px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-2); cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: var(--font-body); }
     .pill:hover { background: var(--surface-2); }
     .pill.active { background: var(--ink); color: white; border-color: var(--ink); }
-    .main { max-width: 900px; margin: 0 auto; padding: 28px 24px 80px; }
+
+    .content-layout {
+      max-width: 1200px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 32px;
+      padding: 28px 24px 80px;
+      align-items: start;
+    }
+
     .loading-wrap { display: flex; flex-direction: column; align-items: center; padding: 80px 0; gap: 16px; }
     .loader { width: 34px; height: 34px; border: 2px solid var(--border-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to{transform:rotate(360deg)} }
     .loading-label { font-size: 14px; color: var(--ink-3); }
+
     .news-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
     .news-card { background: var(--surface); padding: 22px 26px; display: flex; gap: 20px; align-items: flex-start; transition: background 0.15s; cursor: pointer; border: none; text-align: left; width: 100%; font-family: var(--font-body); }
     .news-card:hover { background: var(--surface-2); }
@@ -60,10 +106,34 @@
     .src-badge { font-size: 11px; color: var(--ink-3); }
     .news-headline { font-family: var(--font-display); font-size: 23px; font-weight: 600; line-height: 1.35; color: var(--ink); margin-bottom: 8px; }
     .news-summary { font-size: 13px; color: var(--ink-2); line-height: 1.65; font-weight: 300; }
-    .news-sources { font-size: 11px; color: var(--ink-4); margin-top: 8px; }
+
+    .news-footer { display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .source-chip {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 3px 8px 3px 4px;
+      font-size: 11px; color: var(--ink-2);
+    }
+    .source-chip img { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; }
+    .source-chip-more { font-size: 11px; color: var(--ink-4); padding: 3px 4px; }
+    .time-badge { margin-left: auto; font-size: 11px; color: var(--ink-4); white-space: nowrap; }
+
     .news-arrow { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink-3); align-self: center; transition: all 0.15s; }
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
+
+    .sidebar { position: sticky; top: 80px; }
+    .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .sidebar-item { display: flex; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; text-decoration: none; }
+    .sidebar-item:last-child { border-bottom: none; }
+    .sidebar-item:hover { background: var(--surface-2); }
+    .sidebar-rank { font-family: var(--font-display); font-size: 18px; color: var(--ink-4); flex-shrink: 0; line-height: 1.2; min-width: 20px; }
+    .sidebar-body { flex: 1; min-width: 0; }
+    .sidebar-headline { font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--ink); margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .sidebar-meta { font-size: 11px; color: var(--ink-4); display: flex; align-items: center; gap: 5px; }
+    .sidebar-source-logo { width: 12px; height: 12px; border-radius: 50%; object-fit: cover; }
+
     .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
     .modal { background: white; border-radius: var(--radius); padding: 32px; max-width: 380px; width: 100%; transform: translateY(8px); transition: transform 0.2s; }
@@ -73,13 +143,26 @@
     .modal-input { width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); font-family: var(--font-body); font-size: 14px; margin-bottom: 12px; outline: none; }
     .modal-btn { width: 100%; padding: 11px; border-radius: var(--radius-sm); background: var(--ink); color: white; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: var(--font-body); margin-bottom: 10px; }
     .modal-close { width: 100%; padding: 8px; background: none; color: var(--ink-3); font-size: 13px; border: none; cursor: pointer; font-family: var(--font-body); }
+
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: white; padding: 10px 20px; border-radius: 100px; font-size: 13px; z-index: 300; transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .fade-in { animation: fadeIn 0.4s ease both; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
-    @media(max-width:600px){.hero{padding:28px 16px 20px}.controls-bar,.status-bar{padding:12px 16px}.main{padding:20px 16px 60px}.news-card{padding:18px 14px;gap:14px}.nav-date{display:none}}
+
+    @media(max-width: 900px) {
+      .content-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+    }
+    @media(max-width: 600px) {
+      .hero { padding: 28px 16px 20px; }
+      .controls-bar, .status-bar { padding: 12px 16px; }
+      .content-layout { padding: 20px 16px 60px; }
+      .news-card { padding: 18px 14px; gap: 14px; }
+      .nav-date { display: none; }
+      .nav-ticker { display: none; }
+    }
   </style>
-  <!-- Google tag (gtag.js) -->
+
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -89,23 +172,34 @@
   </script>
 </head>
 <body>
+
 <nav>
   <a class="nav-brand" href="#">haberim<span>var</span></a>
+  <div class="nav-ticker">
+    <span class="ticker-item"><span class="ticker-label">USD</span> <span class="ticker-val" id="t-usd">—</span></span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item"><span class="ticker-label">EUR</span> <span class="ticker-val" id="t-eur">—</span></span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item"><span class="ticker-label">ALTIN</span> <span class="ticker-val" id="t-gold">—</span></span>
+  </div>
   <div class="nav-right">
     <span class="nav-date" id="nav-date"></span>
     <button class="nav-btn" onclick="openModal()">🔔<span class="notif-dot"></span></button>
   </div>
 </nav>
+
 <div class="hero">
   <div class="hero-eyebrow">Yapay Zeka Destekli · Her 15 Dakika Güncellenir</div>
   <h1 class="hero-title">Günün en önemli<br><em>10 haberi.</em></h1>
   <p class="hero-sub">Türkiye ve dünyadan haberler toplanır, önem sırasına göre sıralanır.</p>
 </div>
+
 <div class="status-bar">
   <div class="status-dot" id="status-dot"></div>
   <div class="status-text" id="status-text">Bağlanıyor...</div>
   <div class="next-update" id="next-update"></div>
 </div>
+
 <div class="controls-bar">
   <div class="loc-pills" id="pills">
     <button class="pill active" data-loc="Gündem">📰 Gündem</button>
@@ -115,9 +209,22 @@
     <button class="pill" data-loc="Spor">⚽ Spor</button>
   </div>
 </div>
-<main class="main" id="main-content">
-  <div class="loading-wrap"><div class="loader"></div><div class="loading-label">Haberler yükleniyor...</div></div>
-</main>
+
+<div class="content-layout">
+  <main id="main-content">
+    <div class="loading-wrap"><div class="loader"></div><div class="loading-label">Haberler yükleniyor...</div></div>
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">🔥 Öne Çıkanlar</div>
+      <div id="sidebar-list">
+        <div style="padding:20px 16px;font-size:13px;color:var(--ink-4)">Yükleniyor...</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
   <div class="modal">
     <div class="modal-title">Günlük bildirim al</div>
@@ -127,91 +234,187 @@
     <button class="modal-close" onclick="closeModal()">Vazgeç</button>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
+
 <script>
-let currentLoc = 'Gündem';
-let nextUpdateSec = 900;
-let countdownInterval = null;
+  let currentLoc = 'Gündem';
+  let nextUpdateSec = 900;
+  let countdownInterval = null;
 
-document.getElementById('nav-date').textContent = new Date().toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  const SOURCE_DOMAINS = {
+    'NTV': 'ntv.com.tr', 'NTV Dünya': 'ntv.com.tr', 'NTV Gündem': 'ntv.com.tr', 'NTV Teknoloji': 'ntv.com.tr',
+    'Hürriyet': 'hurriyet.com.tr', 'Hürriyet Dünya': 'hurriyet.com.tr', 'Hürriyet Spor': 'hurriyet.com.tr', 'Hürriyet Ekonomi': 'hurriyet.com.tr',
+    'DW Türkçe': 'dw.com', 'TRT Haber': 'trthaber.com',
+    'Sabah': 'sabah.com.tr', 'Sabah SD': 'sabah.com.tr',
+    'Milliyet': 'milliyet.com.tr', 'Cumhuriyet': 'cumhuriyet.com.tr', 'Haberturk': 'haberturk.com',
+    'Bloomberg HT': 'bloomberght.com', 'Sözcü Spor': 'sozcu.com.tr',
+    'Webtekno': 'webtekno.com', 'ShiftDelete': 'shiftdelete.net',
+  };
 
-document.getElementById('pills').addEventListener('click', e => {
-  const pill = e.target.closest('.pill');
-  if (!pill) return;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  pill.classList.add('active');
-  currentLoc = pill.dataset.loc;
-  loadNews();
-});
-
-async function loadNews() {
-  setStatus('updating', 'Güncelleniyor...');
-  document.getElementById('main-content').innerHTML =
-    `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
-  try {
-    const locMap = {'Gündem':'Gundem','Dünya':'Dunya','Ekonomi':'Ekonomi','Spor':'Spor','Teknoloji':'Teknoloji'};
-    const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    renderNews(data);
-    startCountdown(data.nextUpdateIn || 900);
-    setStatus('live', `Son güncelleme: az önce · ${data.articleCount} haber tarandı`);
-  } catch (err) {
-    document.getElementById('main-content').innerHTML =
-      `<div class="error-wrap">Haberler yüklenemedi: ${err.message}</div>`;
-    setStatus('', 'Bağlantı hatası');
+  function faviconUrl(sourceName) {
+    const domain = SOURCE_DOMAINS[sourceName];
+    return domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32` : null;
   }
-}
 
-function renderNews(data) {
-  const main = document.getElementById('main-content');
-  if (!data.news?.length) { main.innerHTML = '<div class="error-wrap">Haber bulunamadı.</div>'; return; }
-  const rankStr = n => n.rank < 10 ? '0' + n.rank : '' + n.rank;
-  let html = '<div class="news-grid">';
-  data.news.forEach((item, i) => {
-    html += `<button class="news-card fade-in" style="animation-delay:${i*40}ms" onclick="openNews(${i})">
-      <div class="rank-num">${rankStr(item)}</div>
-      <div class="news-body">
-        <div class="news-meta">
-          <span class="cat-badge">${item.category}</span>
-          ${item.isBreaking ? '<span class="breaking-badge">● Son Dakika</span>' : ''}
-          ${item.sourceCount > 1 ? `<span class="src-badge">${item.sourceCount} kaynak</span>` : ''}
-        </div>
-        <div class="news-headline">${item.headline}</div>
-        <div class="news-summary">${item.summary}</div>
-        ${item.sources?.length ? `<div class="news-sources">${item.sources.join(' · ')}</div>` : ''}
-      </div>
-      <div class="news-arrow">→</div>
-    </button>`;
+  function timeAgo(pubDate) {
+    if (!pubDate) return null;
+    const mins = Math.floor((Date.now() - new Date(pubDate).getTime()) / 60000);
+    if (mins < 1) return 'Az önce';
+    if (mins < 60) return `${mins} dk önce`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours} saat önce`;
+    return `${Math.floor(hours / 24)} gün önce`;
+  }
+
+  document.getElementById('nav-date').textContent = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  document.getElementById('pills').addEventListener('click', e => {
+    const pill = e.target.closest('.pill');
+    if (!pill) return;
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentLoc = pill.dataset.loc;
+    loadNews();
   });
-  html += '</div>';
-  main.innerHTML = html;
-  window._newsData = data.news;
-}
 
-function openNews(idx) {
-  const item = window._newsData?.[idx];
-  if (!item) return;
-  if (item.link) { window.open(item.link, '_blank', 'noopener'); }
-}
+  async function loadNews() {
+    setStatus('updating', 'Güncelleniyor...');
+    document.getElementById('main-content').innerHTML = `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
+    try {
+      const locMap = { 'Gündem': 'Gundem', 'Dünya': 'Dunya', 'Ekonomi': 'Ekonomi', 'Spor': 'Spor', 'Teknoloji': 'Teknoloji' };
+      const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      renderNews(data);
+      renderSidebar(data.news);
+      startCountdown(data.nextUpdateIn || 900);
+      setStatus('live', `Son güncelleme: az önce · ${data.articleCount} haber tarandı`);
+    } catch (err) {
+      document.getElementById('main-content').innerHTML = `<div class="error-wrap">Haberler yüklenemedi: ${err.message}</div>`;
+      setStatus('', 'Bağlantı hatası');
+    }
+  }
 
-function openModal() { document.getElementById('modal').classList.add('open'); }
-function closeModal(e) { if (!e || e.target === document.getElementById('modal')) document.getElementById('modal').classList.remove('open'); }
-function subscribe() {
-  const email = document.getElementById('email-input').value;
-  if (!email.includes('@')) { showToast('Geçerli bir e-posta girin'); return; }
-  closeModal(); showToast('✓ Abone oldunuz! Yarın 08:00\'de ilk haberiniz gelecek.');
-}
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
-function setStatus(type, text) { const d = document.getElementById('status-dot'); d.className = 'status-dot' + (type ? ' ' + type : ''); document.getElementById('status-text').innerHTML = text; }
-function startCountdown(seconds) {
-  clearInterval(countdownInterval); nextUpdateSec = seconds; updateCountdown();
-  countdownInterval = setInterval(() => { nextUpdateSec--; if (nextUpdateSec <= 0) { loadNews(); return; } updateCountdown(); }, 1000);
-}
-function updateCountdown() { const m = Math.floor(nextUpdateSec / 60), s = nextUpdateSec % 60; document.getElementById('next-update').textContent = `Sonraki: ${m}:${String(s).padStart(2, '0')}`; }
+  function renderNews(data) {
+    const main = document.getElementById('main-content');
+    if (!data.news?.length) { main.innerHTML = '<div class="error-wrap">Haber bulunamadı.</div>'; return; }
+    const rankStr = n => n.rank < 10 ? '0' + n.rank : '' + n.rank;
+    let html = '<div class="news-grid">';
+    data.news.forEach((item, i) => {
+      const ago = timeAgo(item.pubDate);
+      const sourcesToShow = (item.sources || []).slice(0, 2);
+      const extraCount = (item.sources || []).length - 2;
+      const sourceChips = sourcesToShow.map(s => {
+        const fav = faviconUrl(s);
+        const img = fav ? `<img src="${fav}" alt="" onerror="this.style.display='none'">` : '';
+        return `<span class="source-chip">${img}${s}</span>`;
+      }).join('');
+      const extraChip = extraCount > 0 ? `<span class="source-chip-more">+${extraCount}</span>` : '';
+      const timeChip = ago ? `<span class="time-badge">${ago}</span>` : '';
 
-loadNews();
-setInterval(loadNews, 15 * 60 * 1000);
+      html += `<button class="news-card fade-in" style="animation-delay:${i*40}ms" onclick="openNews(${i})">
+        <div class="rank-num">${rankStr(item)}</div>
+        <div class="news-body">
+          <div class="news-meta">
+            <span class="cat-badge">${item.category}</span>
+            ${item.isBreaking ? '<span class="breaking-badge">● Son Dakika</span>' : ''}
+            ${item.sourceCount > 1 ? `<span class="src-badge">${item.sourceCount} kaynak</span>` : ''}
+          </div>
+          <div class="news-headline">${item.headline}</div>
+          <div class="news-summary">${item.summary}</div>
+          <div class="news-footer">${sourceChips}${extraChip}${timeChip}</div>
+        </div>
+        <div class="news-arrow">→</div>
+      </button>`;
+    });
+    html += '</div>';
+    main.innerHTML = html;
+    window._newsData = data.news;
+  }
+
+  function renderSidebar(newsItems) {
+    if (!newsItems?.length) return;
+    const top5 = [...newsItems].sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 5);
+    let html = '';
+    top5.forEach((item, i) => {
+      const ago = timeAgo(item.pubDate);
+      const src = (item.sources?.[0]) || '';
+      const fav = faviconUrl(src);
+      const imgTag = fav ? `<img class="sidebar-source-logo" src="${fav}" alt="" onerror="this.style.display='none'">` : '';
+      html += `<a class="sidebar-item" href="${item.link || '#'}" target="_blank" rel="noopener">
+        <div class="sidebar-rank">${i + 1}</div>
+        <div class="sidebar-body">
+          <div class="sidebar-headline">${item.headline}</div>
+          <div class="sidebar-meta">${imgTag}${src}${ago ? ' · ' + ago : ''}</div>
+        </div>
+      </a>`;
+    });
+    document.getElementById('sidebar-list').innerHTML = html;
+  }
+
+  function openNews(idx) {
+    const item = window._newsData?.[idx];
+    if (item?.link) window.open(item.link, '_blank', 'noopener');
+  }
+
+  function openModal() { document.getElementById('modal').classList.add('open'); }
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modal'))
+      document.getElementById('modal').classList.remove('open');
+  }
+  function subscribe() {
+    const email = document.getElementById('email-input').value;
+    if (!email.includes('@')) { showToast('Geçerli bir e-posta girin'); return; }
+    closeModal();
+    showToast('✓ Abone oldunuz! Yarın 08:00\'de ilk haberiniz gelecek.');
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function setStatus(type, text) {
+    document.getElementById('status-dot').className = 'status-dot' + (type ? ' ' + type : '');
+    document.getElementById('status-text').innerHTML = text;
+  }
+  function startCountdown(seconds) {
+    clearInterval(countdownInterval);
+    nextUpdateSec = seconds;
+    updateCountdown();
+    countdownInterval = setInterval(() => {
+      nextUpdateSec--;
+      if (nextUpdateSec <= 0) { loadNews(); return; }
+      updateCountdown();
+    }, 1000);
+  }
+  function updateCountdown() {
+    const m = Math.floor(nextUpdateSec / 60), s = nextUpdateSec % 60;
+    document.getElementById('next-update').textContent = `Sonraki: ${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  async function fetchRates() {
+    try {
+      const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      const data = await res.json();
+      const usdTry = data.rates?.TRY;
+      if (usdTry) document.getElementById('t-usd').textContent = usdTry.toFixed(2) + ' ₺';
+      if (data.rates?.EUR && usdTry) {
+        document.getElementById('t-eur').textContent = (usdTry / data.rates.EUR).toFixed(2) + ' ₺';
+      }
+    } catch(e) {}
+    try {
+      const res2 = await fetch('https://api.exchangerate-api.com/v4/latest/XAU');
+      const data2 = await res2.json();
+      const goldTry = data2.rates?.TRY;
+      if (goldTry) document.getElementById('t-gold').textContent = goldTry.toFixed(0) + ' ₺';
+    } catch(e) {}
+  }
+
+  fetchRates();
+  setInterval(fetchRates, 5 * 60 * 1000);
+  loadNews();
+  setInterval(loadNews, 15 * 60 * 1000);
 </script>
 </body>
 </html>
