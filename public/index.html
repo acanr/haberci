@@ -65,7 +65,7 @@
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
 
-    /* OKUYUCU MODU — yeni */
+    /* OKUYUCU MODU */
     .reader-panel { position: fixed; inset: 0; z-index: 150; display: flex; align-items: flex-end; pointer-events: none; }
     .reader-panel.open { pointer-events: all; }
     .reader-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.25s; }
@@ -85,6 +85,13 @@
     .reader-divider { width: 40px; height: 2px; background: var(--accent); margin-bottom: 20px; border-radius: 1px; }
     .reader-body { font-size: 16px; color: var(--ink-2); line-height: 1.8; font-weight: 300; }
     .reader-body.empty { font-style: italic; color: var(--ink-4); }
+    .reader-body img { display: none; }
+    .reader-body p { margin-bottom: 1em; }
+    .reader-body a { color: var(--accent); text-decoration: none; }
+    .reader-body a:hover { text-decoration: underline; }
+    .reader-body h2, .reader-body h3 { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin: 1.5em 0 0.5em; color: var(--ink); }
+    .reader-body blockquote { border-left: 3px solid var(--accent); padding-left: 16px; margin: 1em 0; color: var(--ink-3); font-style: italic; }
+    .reader-body strong { color: var(--ink); font-weight: 500; }
     .reader-sources { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .reader-sources-label { font-size: 11px; color: var(--ink-4); text-transform: uppercase; letter-spacing: 0.08em; }
     .reader-source-chip { font-size: 11px; color: var(--ink-3); background: var(--surface-2); padding: 3px 10px; border-radius: 100px; border: 1px solid var(--border); }
@@ -248,7 +255,6 @@ function renderNews(data) {
   window._newsData = data.news;
 }
 
-// Her tıklamada okuyucu modu açılır
 function openNews(idx) {
   const item = window._newsData?.[idx];
   if (!item) return;
@@ -256,23 +262,23 @@ function openNews(idx) {
 }
 
 function openReader(item) {
-  // Kategori
   document.getElementById('r-cat').textContent = item.category;
-
-  // Başlık
   document.getElementById('r-title').textContent = item.headline;
 
-  // Özet / içerik
   const body = document.getElementById('r-body');
-  if (item.summary && item.summary !== 'Detaylar için habere tıklayın.') {
+  if (item.fullContent) {
+    // Tam içerik varsa HTML olarak göster
+    body.innerHTML = item.fullContent;
+    body.classList.remove('empty');
+  } else if (item.summary) {
+    // Özet varsa düz metin
     body.textContent = item.summary;
     body.classList.remove('empty');
   } else {
-    body.textContent = 'Bu kaynak özet içeriği sağlamıyor.';
+    body.textContent = 'Bu kaynak içerik sağlamıyor.';
     body.classList.add('empty');
   }
 
-  // Kaynağa git butonu
   const link = document.getElementById('r-link');
   if (item.link) {
     link.href = item.link;
@@ -281,11 +287,8 @@ function openReader(item) {
     link.style.display = 'none';
   }
 
-  // Kaynak etiketi (header'da küçük)
-  const sourceLabel = document.getElementById('r-source');
-  sourceLabel.textContent = item.sources?.length ? item.sources.join(' · ') : '';
+  document.getElementById('r-source').textContent = item.sources?.length ? item.sources.join(' · ') : '';
 
-  // Alt kaynak chip'leri
   const sourcesEl = document.getElementById('r-sources');
   if (item.sources?.length) {
     sourcesEl.innerHTML = `<span class="reader-sources-label">Kaynak</span>` +
@@ -295,7 +298,6 @@ function openReader(item) {
     sourcesEl.style.display = 'none';
   }
 
-  // Paneli aç
   document.getElementById('reader-panel').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -305,7 +307,6 @@ function closeReader() {
   document.body.style.overflow = '';
 }
 
-// ESC ile kapat
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeReader();
 });
