@@ -26,9 +26,8 @@ const RSS_SOURCES = {
     { name: 'DW Türkçe',      url: 'https://rss.dw.com/rdf/rss-tur-all',        weight: 1.2 },
   ],
   'Ekonomi': [
-    { name: 'NTV Ekonomi',      url: 'https://www.ntv.com.tr/ekonomi.rss',          weight: 1.2 },
-    { name: 'Hürriyet Ekonomi', url: 'https://www.hurriyet.com.tr/rss/ekonomi',     weight: 1.0 },
-    { name: 'Sözcü Ekonomi',    url: 'https://www.sozcu.com.tr/rss/ekonomi.xml',    weight: 1.0 },
+    { name: 'Hürriyet Ekonomi', url: 'https://www.hurriyet.com.tr/rss/ekonomi', weight: 1.0 },
+    { name: 'Bloomberg HT',     url: 'https://www.bloomberght.com/rss',          weight: 1.3 },
   ],
   'Spor': [
     { name: 'NTV Gündem',    url: 'https://www.ntv.com.tr/gundem.rss',      weight: 1.0 },
@@ -200,7 +199,7 @@ function scoreItem(item, clusterSize, location) {
   else if (ageHours < 6)  score += 10;
   else if (ageHours < 12) score += 5;
   else if (ageHours < 24) score += 0;
-  else if (ageHours < 36) score += -10;
+  else if (ageHours < 36) score -= 10;
 
   score += Math.round((item.sourceWeight || 1.0) * 5);
   score += clusterBonus(clusterSize);
@@ -252,7 +251,11 @@ async function fetchNews(location) {
     return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
 
-  const sorted = scored.sort((a, b) => b.score - a.score);
+  // Ekonomi kategorisinde kronolojik sıralama (yeniden eskiye)
+  const sorted = location === 'Ekonomi'
+    ? scored.sort((a, b) => getItemAge(a) - getItemAge(b))
+    : scored.sort((a, b) => b.score - a.score);
+
   console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize}src)`).join(' | ')}`);
 
   const news = sorted.slice(0, 10).map((item, i) => ({
