@@ -106,8 +106,14 @@ function parseRSS(xml, source) {
     const title = extractTag(content, 'title');
     const description = extractTag(content, 'description') || extractTag(content, 'announce');
     const pubDate = extractTag(content, 'pubDate');
-    const link = extractTag(content, 'link') ||
-      content.match(/<link>([^<]+)<\/link>/i)?.[1] || '';
+    // Link: önce <link>, sonra guid isPermaLink="true", sonra herhangi guid
+    let link = extractTag(content, 'link')
+      || content.match(/<link>([^<]+)<\/link>/i)?.[1]
+      || content.match(/<guid[^>]*isPermaLink="true"[^>]*>([^<]+)<\/guid>/i)?.[1]
+      || content.match(/<guid[^>]*>([^<]+)<\/guid>/i)?.[1]
+      || '';
+    // Sadece http/https ile başlayanları kabul et
+    if (link && !link.startsWith('http')) link = '';
     if (title && title.length > 10) {
       items.push({ title, description, pubDate, link, source: source.name, sourceWeight: source.weight });
     }
@@ -268,6 +274,7 @@ async function fetchNews(location) {
     sources: item.allSources,
     link: item.link,
     score: item.score,
+    pubDate: item.pubDate,
   }));
 
   return {
