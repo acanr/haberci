@@ -10,10 +10,10 @@ const LOCATIONS = ['Gundem', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
 
 const RSS_SOURCES = {
   'Gundem': [
-    { name: 'NTV',        url: 'https://www.ntv.com.tr/gundem.rss',                      weight: 1.2 },
+    { name: 'NTV',        url: 'https://www.ntv.com.tr/gundem.rss',                      weight: 1.0 },
     { name: 'Hürriyet',   url: 'https://www.hurriyet.com.tr/rss/gundem',                  weight: 1.0 },
-    { name: 'DW Türkçe',  url: 'https://rss.dw.com/rdf/rss-tur-all',                      weight: 1.2 },
-    { name: 'TRT Haber',  url: 'https://www.trthaber.com/sondakika.rss',                  weight: 1.2 },
+    { name: 'DW Türkçe',  url: 'https://rss.dw.com/rdf/rss-tur-all',                      weight: 1.0 },
+    { name: 'TRT Haber',  url: 'https://www.trthaber.com/sondakika.rss',                  weight: 1.0 },
     { name: 'Sabah',      url: 'https://www.sabah.com.tr/rss/gundem.xml',                 weight: 1.0 },
     { name: 'Sabah SD',   url: 'https://www.sabah.com.tr/rss/sondakika.xml',              weight: 1.0 },
     { name: 'Milliyet',   url: 'https://www.milliyet.com.tr/rss/rssnew/sondakikarss.xml', weight: 1.0 },
@@ -58,7 +58,7 @@ const CLICKBAIT_KEYWORDS = [
 ];
 
 const IMPORTANCE_KEYWORDS = {
-  'deprem': 30, 'sel': 20, 'yangın': 20, 'patlama': 25,
+  'deprem': 20, 'sel': 20, 'yangın': 20, 'patlama': 25,
   'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
   'saldırı': 30, 'kriz': 10,
   'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,
@@ -67,7 +67,7 @@ const IMPORTANCE_KEYWORDS = {
   'cumhurbaşkan': 15, 'meclis': 12, 'seçim': 15, 'hükümet': 10,
   'merkez bankası': 15, 'faiz': 12, 'dolar': 10, 'borsa': 10, 'enflasyon': 12,
   'şampiyon': 10, 'gol': 8, 'maç': 8,
-  'yapay zeka': 0, 'iphone': 10, 'tesla': 8,
+  'yapay zeka': 0, 'iphone': 0, 'tesla': 0,
 };
 
 const SPOR_KEYWORDS = [
@@ -199,6 +199,8 @@ function scoreItem(item, clusterSize, location) {
   else if (ageHours < 3)  score += 20;
   else if (ageHours < 6)  score += 10;
   else if (ageHours < 12) score += 5;
+  else if (ageHours < 24) score += 0;
+  else if (ageHours < 36) score += -10;
 
   score += Math.round((item.sourceWeight || 1.0) * 5);
   score += clusterBonus(clusterSize);
