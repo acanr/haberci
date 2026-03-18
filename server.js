@@ -106,14 +106,28 @@ function parseRSS(xml, source) {
     const title = extractTag(content, 'title');
     const description = extractTag(content, 'description') || extractTag(content, 'announce');
     const pubDate = extractTag(content, 'pubDate');
-    // Link: önce <link>, sonra guid isPermaLink="true", sonra herhangi guid
+
+    // Link: sırayla dene
     let link = extractTag(content, 'link')
       || content.match(/<link>([^<]+)<\/link>/i)?.[1]
       || content.match(/<guid[^>]*isPermaLink="true"[^>]*>([^<]+)<\/guid>/i)?.[1]
-      || content.match(/<guid[^>]*>([^<]+)<\/guid>/i)?.[1]
       || '';
-    // Sadece http/https ile başlayanları kabul et
-    if (link && !link.startsWith('http')) link = '';
+
+    // Hâlâ boşsa description içinde kaynak domain'i ara (Milliyet gibi)
+    if (!link || !link.startsWith('http')) {
+      const sourceDomain = source.url.match(/https?:\/\/(?:www\.)?([^/]+)/)?.[1] || '';
+      if (sourceDomain) {
+        const urlInDesc = content.match(new RegExp(`https?://(?:www\\.)?${sourceDomain.replace('.', '\\.')}[^\\s"'<>]+`, 'i'))?.[0] || '';
+        if (urlInDesc.startsWith('http')) link = urlInDesc;
+      }
+    }
+
+    // Son çare: guid sayısal değilse URL olarak kullan
+    if (!link || !link.startsWith('http')) {
+      const guid = content.match(/<guid[^>]*>([^<]+)<\/guid>/i)?.[1] || '';
+      if (guid.startsWith('http')) link = guid;
+    }
+
     if (title && title.length > 10) {
       items.push({ title, description, pubDate, link, source: source.name, sourceWeight: source.weight });
     }
@@ -257,7 +271,6 @@ async function fetchNews(location) {
     return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
 
-  // Ekonomi kategorisinde kronolojik sıralama (yeniden eskiye)
   const sorted = location === 'Ekonomi'
     ? scored.sort((a, b) => getItemAge(a) - getItemAge(b))
     : scored.sort((a, b) => b.score - a.score);
