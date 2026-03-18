@@ -106,14 +106,10 @@ function parseRSS(xml, source) {
     const title = extractTag(content, 'title');
     const description = extractTag(content, 'description') || extractTag(content, 'announce');
     const pubDate = extractTag(content, 'pubDate');
-
-    // Link: sırayla dene
     let link = extractTag(content, 'link')
       || content.match(/<link>([^<]+)<\/link>/i)?.[1]
       || content.match(/<guid[^>]*isPermaLink="true"[^>]*>([^<]+)<\/guid>/i)?.[1]
       || '';
-
-    // Hâlâ boşsa description içinde kaynak domain'i ara (Milliyet gibi)
     if (!link || !link.startsWith('http')) {
       const sourceDomain = source.url.match(/https?:\/\/(?:www\.)?([^/]+)/)?.[1] || '';
       if (sourceDomain) {
@@ -121,13 +117,10 @@ function parseRSS(xml, source) {
         if (urlInDesc.startsWith('http')) link = urlInDesc;
       }
     }
-
-    // Son çare: guid sayısal değilse URL olarak kullan
     if (!link || !link.startsWith('http')) {
       const guid = content.match(/<guid[^>]*>([^<]+)<\/guid>/i)?.[1] || '';
       if (guid.startsWith('http')) link = guid;
     }
-
     if (title && title.length > 10) {
       items.push({ title, description, pubDate, link, source: source.name, sourceWeight: source.weight });
     }
@@ -208,11 +201,9 @@ function getItemAge(item) {
 function scoreItem(item, clusterSize, location) {
   const t = (item.title + ' ' + (item.description || '')).toLowerCase();
   let score = 0;
-
   for (const [kw, pts] of Object.entries(IMPORTANCE_KEYWORDS)) {
     if (t.includes(kw)) score += pts;
   }
-
   const ageHours = getItemAge(item) / (1000 * 60 * 60);
   if (ageHours < 1)       score += 30;
   else if (ageHours < 3)  score += 20;
@@ -220,15 +211,12 @@ function scoreItem(item, clusterSize, location) {
   else if (ageHours < 12) score += 5;
   else if (ageHours < 24) score += 0;
   else if (ageHours < 36) score -= 10;
-
   score += Math.round((item.sourceWeight || 1.0) * 5);
   score += clusterBonus(clusterSize);
-
   if (location === 'Gundem') {
     const isSport = SPOR_KEYWORDS.some(kw => t.includes(kw));
     if (isSport) score -= 10;
   }
-
   return score;
 }
 
@@ -254,13 +242,10 @@ async function fetchNews(location) {
   const allItems = results
     .filter(r => r.status === 'fulfilled')
     .flatMap(r => r.value);
-
   console.log(`[RSS] ${location}: ${allItems.length} ham haber`);
-
   const clean = allItems.filter(item => !isSpam(item.title));
   const clusters = clusterNews(clean);
   console.log(`[CLUSTER] ${location}: ${clusters.length} cluster oluştu`);
-
   const scored = clusters.map(cluster => {
     const size = cluster.items.length;
     const uniqueSources = [...new Set(cluster.items.map(i => i.source))];
@@ -270,13 +255,10 @@ async function fetchNews(location) {
     const score = scoreItem(representative, size, location);
     return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
-
   const sorted = location === 'Ekonomi'
     ? scored.sort((a, b) => getItemAge(a) - getItemAge(b))
     : scored.sort((a, b) => b.score - a.score);
-
   console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize}src)`).join(' | ')}`);
-
   const news = sorted.slice(0, 10).map((item, i) => ({
     rank: i + 1,
     category: guessCategory(item.title, item.description, location),
@@ -289,7 +271,6 @@ async function fetchNews(location) {
     score: item.score,
     pubDate: item.pubDate,
   }));
-
   return {
     news,
     articleCount: allItems.length,
@@ -334,6 +315,16 @@ app.get('/api/status', function(req, res) {
     }),
     serverTime: new Date().toISOString(),
   });
+});
+
+app.get('/hakkimizda', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public', 'hakkimizda.html'));
+});
+app.get('/iletisim', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public', 'iletisim.html'));
+});
+app.get('/gizlilik', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public', 'gizlilik.html'));
 });
 
 app.get('*', function(req, res) {
