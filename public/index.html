@@ -64,19 +64,31 @@
     .news-arrow { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink-3); align-self: center; transition: all 0.15s; }
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
-    .detail-panel { position: fixed; inset: 0; z-index: 150; display: flex; align-items: flex-end; pointer-events: none; }
-    .detail-panel.open { pointer-events: all; }
-    .detail-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.25s; }
-    .detail-panel.open .detail-backdrop { opacity: 1; }
-    .detail-sheet { position: relative; z-index: 1; width: 100%; max-height: 80vh; background: white; border-radius: var(--radius) var(--radius) 0 0; padding: 28px 28px 48px; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); }
-    .detail-panel.open .detail-sheet { transform: translateY(0); }
-    .detail-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--surface-3); margin: 0 auto 24px; }
-    .detail-cat { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-    .detail-title { font-family: var(--font-display); font-size: 26px; line-height: 1.25; margin-bottom: 16px; }
-    .detail-body { font-size: 15px; color: var(--ink-2); line-height: 1.75; font-weight: 300; }
-    .detail-sources { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-3); }
-    .detail-link { display: inline-block; margin-top: 16px; color: var(--accent); font-size: 13px; text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
-    .detail-link:hover { border-bottom-color: var(--accent); }
+
+    /* OKUYUCU MODU — yeni */
+    .reader-panel { position: fixed; inset: 0; z-index: 150; display: flex; align-items: flex-end; pointer-events: none; }
+    .reader-panel.open { pointer-events: all; }
+    .reader-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.25s; }
+    .reader-panel.open .reader-backdrop { opacity: 1; }
+    .reader-sheet { position: relative; z-index: 1; width: 100%; max-height: 88vh; background: white; border-radius: var(--radius) var(--radius) 0 0; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); display: flex; flex-direction: column; }
+    .reader-panel.open .reader-sheet { transform: translateY(0); }
+    .reader-header { position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .reader-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface-2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--ink-3); flex-shrink: 0; transition: all 0.15s; }
+    .reader-close:hover { background: var(--surface-3); color: var(--ink); }
+    .reader-source-label { font-size: 12px; color: var(--ink-3); flex: 1; }
+    .reader-goto { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 100px; background: var(--ink); color: white; font-size: 12px; font-weight: 500; text-decoration: none; font-family: var(--font-body); transition: opacity 0.15s; white-space: nowrap; }
+    .reader-goto:hover { opacity: 0.85; }
+    .reader-goto svg { width: 12px; height: 12px; }
+    .reader-content { padding: 28px 28px 48px; max-width: 680px; margin: 0 auto; width: 100%; }
+    .reader-cat { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+    .reader-title { font-family: var(--font-display); font-size: clamp(22px, 4vw, 30px); font-weight: 600; line-height: 1.25; color: var(--ink); margin-bottom: 20px; }
+    .reader-divider { width: 40px; height: 2px; background: var(--accent); margin-bottom: 20px; border-radius: 1px; }
+    .reader-body { font-size: 16px; color: var(--ink-2); line-height: 1.8; font-weight: 300; }
+    .reader-body.empty { font-style: italic; color: var(--ink-4); }
+    .reader-sources { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .reader-sources-label { font-size: 11px; color: var(--ink-4); text-transform: uppercase; letter-spacing: 0.08em; }
+    .reader-source-chip { font-size: 11px; color: var(--ink-3); background: var(--surface-2); padding: 3px 10px; border-radius: 100px; border: 1px solid var(--border); }
+
     .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
     .modal { background: white; border-radius: var(--radius); padding: 32px; max-width: 380px; width: 100%; transform: translateY(8px); transition: transform 0.2s; }
@@ -90,7 +102,15 @@
     .toast.show { transform: translateX(-50%) translateY(0); }
     .fade-in { animation: fadeIn 0.4s ease both; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
-    @media(max-width:600px){.hero{padding:28px 16px 20px}.controls-bar,.status-bar{padding:12px 16px}.main{padding:20px 16px 60px}.news-card{padding:18px 14px;gap:14px}.nav-date{display:none}}
+    @media(max-width:600px){
+      .hero{padding:28px 16px 20px}
+      .controls-bar,.status-bar{padding:12px 16px}
+      .main{padding:20px 16px 60px}
+      .news-card{padding:18px 14px;gap:14px}
+      .nav-date{display:none}
+      .reader-content{padding:20px 20px 40px}
+      .reader-title{font-size:22px}
+    }
   </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-1JEZC9B1CE"></script>
@@ -131,17 +151,31 @@
 <main class="main" id="main-content">
   <div class="loading-wrap"><div class="loader"></div><div class="loading-label">Haberler yükleniyor...</div></div>
 </main>
-<div class="detail-panel" id="detail-panel">
-  <div class="detail-backdrop" onclick="closeDetail()"></div>
-  <div class="detail-sheet">
-    <div class="detail-handle"></div>
-    <div class="detail-cat" id="d-cat"></div>
-    <div class="detail-title" id="d-title"></div>
-    <div class="detail-body" id="d-body"></div>
-    <div class="detail-sources" id="d-sources"></div>
-    <a class="detail-link" id="d-link" target="_blank" rel="noopener">Haberin tamamını oku →</a>
+
+<!-- OKUYUCU MODU PANEL -->
+<div class="reader-panel" id="reader-panel">
+  <div class="reader-backdrop" onclick="closeReader()"></div>
+  <div class="reader-sheet">
+    <div class="reader-header">
+      <button class="reader-close" onclick="closeReader()">✕</button>
+      <span class="reader-source-label" id="r-source"></span>
+      <a class="reader-goto" id="r-link" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 10L10 2M10 2H5M10 2V7"/>
+        </svg>
+        Kaynağa git
+      </a>
+    </div>
+    <div class="reader-content">
+      <div class="reader-cat" id="r-cat"></div>
+      <div class="reader-title" id="r-title"></div>
+      <div class="reader-divider"></div>
+      <div class="reader-body" id="r-body"></div>
+      <div class="reader-sources" id="r-sources"></div>
+    </div>
   </div>
 </div>
+
 <div class="modal-backdrop" id="modal" onclick="closeModal(event)">
   <div class="modal">
     <div class="modal-title">Günlük bildirim al</div>
@@ -152,6 +186,7 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script>
 let currentLoc = 'Gündem';
 let nextUpdateSec = 900;
@@ -213,24 +248,68 @@ function renderNews(data) {
   window._newsData = data.news;
 }
 
+// Her tıklamada okuyucu modu açılır
 function openNews(idx) {
-  const item = window._newsData?.[idx]; if (!item) return;
-  if (item.link) { window.open(item.link, '_blank', 'noopener'); }
-  else { openDetail(idx); }
+  const item = window._newsData?.[idx];
+  if (!item) return;
+  openReader(item);
 }
 
-function openDetail(idx) {
-  const item = window._newsData?.[idx]; if (!item) return;
-  document.getElementById('d-cat').textContent = item.category;
-  document.getElementById('d-title').textContent = item.headline;
-  document.getElementById('d-body').textContent = item.summary;
-  document.getElementById('d-sources').textContent = item.sources?.length ? 'Kaynak: ' + item.sources.join(', ') : '';
-  const link = document.getElementById('d-link');
-  if (item.link) { link.href = item.link; link.style.display = 'inline-block'; }
-  else { link.style.display = 'none'; }
-  document.getElementById('detail-panel').classList.add('open');
+function openReader(item) {
+  // Kategori
+  document.getElementById('r-cat').textContent = item.category;
+
+  // Başlık
+  document.getElementById('r-title').textContent = item.headline;
+
+  // Özet / içerik
+  const body = document.getElementById('r-body');
+  if (item.summary && item.summary !== 'Detaylar için habere tıklayın.') {
+    body.textContent = item.summary;
+    body.classList.remove('empty');
+  } else {
+    body.textContent = 'Bu kaynak özet içeriği sağlamıyor.';
+    body.classList.add('empty');
+  }
+
+  // Kaynağa git butonu
+  const link = document.getElementById('r-link');
+  if (item.link) {
+    link.href = item.link;
+    link.style.display = 'flex';
+  } else {
+    link.style.display = 'none';
+  }
+
+  // Kaynak etiketi (header'da küçük)
+  const sourceLabel = document.getElementById('r-source');
+  sourceLabel.textContent = item.sources?.length ? item.sources.join(' · ') : '';
+
+  // Alt kaynak chip'leri
+  const sourcesEl = document.getElementById('r-sources');
+  if (item.sources?.length) {
+    sourcesEl.innerHTML = `<span class="reader-sources-label">Kaynak</span>` +
+      item.sources.map(s => `<span class="reader-source-chip">${s}</span>`).join('');
+    sourcesEl.style.display = 'flex';
+  } else {
+    sourcesEl.style.display = 'none';
+  }
+
+  // Paneli aç
+  document.getElementById('reader-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function closeDetail() { document.getElementById('detail-panel').classList.remove('open'); }
+
+function closeReader() {
+  document.getElementById('reader-panel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ESC ile kapat
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeReader();
+});
+
 function openModal() { document.getElementById('modal').classList.add('open'); }
 function closeModal(e) { if (!e || e.target === document.getElementById('modal')) document.getElementById('modal').classList.remove('open'); }
 function subscribe() {
