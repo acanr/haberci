@@ -30,9 +30,7 @@ const RSS_SOURCES = {
     { name: 'Bloomberg HT',     url: 'https://www.bloomberght.com/rss',          weight: 1.3 },
   ],
   'Spor': [
-    { name: 'NTV Gündem',    url: 'https://www.ntv.com.tr/gundem.rss',      weight: 1.0 },
     { name: 'Hürriyet Spor', url: 'https://www.hurriyet.com.tr/rss/spor',  weight: 1.0 },
-    { name: 'Sözcü Spor',    url: 'https://www.sozcu.com.tr/rss/spor.xml', weight: 1.0 },
   ],
   'Teknoloji': [
     { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss', weight: 1.2 },
@@ -57,7 +55,7 @@ const CLICKBAIT_KEYWORDS = [
 ];
 
 const IMPORTANCE_KEYWORDS = {
-  'deprem': 20, 'sel': 20, 'yangın': 20, 'patlama': 25,
+  'deprem': 20,'yangın': 20, 'patlama': 25,
   'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
   'saldırı': 30, 'kriz': 10,
   'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,
