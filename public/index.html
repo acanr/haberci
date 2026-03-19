@@ -236,9 +236,24 @@
 
 function timeAgo(pubDate) {
   if (!pubDate) return null;
-  const cleaned = pubDate.trim().replace(/\s+Z$/i, 'Z').replace(/\s{2,}/g, ' ');
-  const date = new Date(cleaned);
-  if (isNaN(date.getTime())) return null;
+  let date;
+  try {
+    // Önce standart parse dene
+    const cleaned = pubDate.trim().replace(/\s+Z$/i, 'Z').replace(/\s{2,}/g, ' ');
+    date = new Date(cleaned);
+    // Safari bazı RFC 822 formatlarını parse edemiyor, manuel parse
+    if (isNaN(date.getTime())) {
+      // "Thu, 19 Mar 2026 11:07:00 Z" veya "Thu, 19 Mar 2026 11:07:00 +0300"
+      const m = cleaned.match(/(\d{1,2})\s+(\w{3})\s+(\d{4})\s+(\d{2}):(\d{2}):(\d{2})\s*(Z|[+-]\d{4})?/);
+      if (m) {
+        const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+        const tz = m[7] || 'Z';
+        const offsetMin = tz === 'Z' ? 0 : (parseInt(tz.slice(0,3))*60 + parseInt(tz.slice(0,1)+tz.slice(3)));
+        date = new Date(Date.UTC(+m[3], months[m[2]], +m[1], +m[4], +m[5]-offsetMin, +m[6]));
+      }
+    }
+  } catch(e) { return null; }
+  if (!date || isNaN(date.getTime())) return null;
   const mins = Math.floor((Date.now() - date.getTime()) / 60000);
   if (mins < 1) return 'Az önce';
   if (mins < 60) return `${mins} dk önce`;
