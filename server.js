@@ -217,7 +217,7 @@ function scoreItem(item, clusterSize, location) {
   score += clusterBonus(clusterSize);
   if (location === 'Gundem') {
     const isSport = SPOR_KEYWORDS.some(kw => t.includes(kw));
-    if (isSport) score -= 10;
+    if (isSport) score -= 0;
   }
   return score;
 }
