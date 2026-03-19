@@ -19,29 +19,24 @@
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font-body); background: var(--surface); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-
     nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
     .nav-brand { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; flex-shrink: 0; }
     .nav-brand span { color: var(--accent); }
     .nav-right { display: flex; align-items: center; gap: 10px; }
     .nav-date { font-size: 13px; color: var(--ink-3); }
-
     .nav-ticker { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 100px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
     .ticker-item { display: flex; align-items: center; gap: 4px; }
     .ticker-label { color: var(--ink-3); font-weight: 400; }
     .ticker-val { color: var(--ink); }
     .ticker-sep { color: var(--border-strong); }
-
     .nav-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: background 0.15s; position: relative; }
     .nav-btn:hover { background: var(--surface-2); }
     .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid white; }
-
     .hero { padding: 48px 24px 28px; max-width: 1200px; margin: 0 auto; border-bottom: 1px solid var(--border); }
     .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
     .hero-title { font-family: var(--font-display); font-size: clamp(30px,5vw,50px); font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin-bottom: 14px; }
     .hero-title em { font-style: italic; color: var(--ink-2); }
     .hero-sub { font-size: 15px; color: var(--ink-2); line-height: 1.6; max-width: 500px; font-weight: 300; }
-
     .status-bar { max-width: 1200px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; transition: background 0.3s; }
     .status-dot.live { background: var(--green); animation: pulse 2s ease infinite; }
@@ -49,14 +44,11 @@
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
     .status-text { font-size: 12px; color: var(--ink-3); }
     .next-update { margin-left: auto; font-size: 12px; color: var(--ink-4); }
-
     .controls-bar { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
     .loc-pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
     .pill { padding: 7px 16px; border-radius: 100px; font-size: 13px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-2); cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: var(--font-body); }
     .pill:hover { background: var(--surface-2); }
     .pill.active { background: var(--ink); color: white; border-color: var(--ink); }
-
-    /* INLINE SEARCH BAR */
     .search-bar-inline { max-width: 1200px; margin: 0 auto; padding: 12px 24px; border-bottom: 1px solid var(--border); }
     .search-bar-inner { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 100px; padding: 8px 16px; transition: border-color 0.15s, background 0.15s; }
     .search-bar-inner:focus-within { border-color: var(--ink); background: var(--surface); }
@@ -65,14 +57,11 @@
     .search-bar-input::placeholder { color: var(--ink-4); }
     .search-bar-clear { border: none; background: none; color: var(--ink-3); cursor: pointer; font-size: 14px; padding: 0; line-height: 1; flex-shrink: 0; }
     .search-result-meta { font-size: 13px; color: var(--ink-3); margin-bottom: 16px; }
-
     .content-layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 300px; gap: 32px; padding: 28px 24px 80px; align-items: start; }
-
     .loading-wrap { display: flex; flex-direction: column; align-items: center; padding: 80px 0; gap: 16px; }
     .loader { width: 34px; height: 34px; border: 2px solid var(--border-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to{transform:rotate(360deg)} }
     .loading-label { font-size: 14px; color: var(--ink-3); }
-
     .news-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
     .news-card { background: var(--surface); padding: 22px 26px; display: flex; gap: 20px; align-items: flex-start; transition: background 0.15s; cursor: pointer; border: none; text-align: left; width: 100%; font-family: var(--font-body); }
     .news-card:hover { background: var(--surface-2); }
@@ -93,7 +82,6 @@
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
     .search-highlight { background: #fff3cd; border-radius: 2px; padding: 0 2px; }
-
     .sidebar { position: sticky; top: 80px; }
     .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
@@ -106,7 +94,6 @@
     .sidebar-source-name { font-size: 11px; font-weight: 500; color: var(--ink-2); }
     .sidebar-headline { font-size: 13px; color: var(--ink); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .sidebar-time { font-size: 11px; color: var(--ink-4); margin-top: 3px; }
-
     .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
     .modal-backdrop.open { opacity: 1; pointer-events: all; }
     .modal { background: white; border-radius: var(--radius); padding: 32px; max-width: 380px; width: 100%; transform: translateY(8px); transition: transform 0.2s; }
@@ -116,12 +103,10 @@
     .modal-input { width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); font-family: var(--font-body); font-size: 14px; margin-bottom: 12px; outline: none; }
     .modal-btn { width: 100%; padding: 11px; border-radius: var(--radius-sm); background: var(--ink); color: white; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: var(--font-body); margin-bottom: 10px; }
     .modal-close { width: 100%; padding: 8px; background: none; color: var(--ink-3); font-size: 13px; border: none; cursor: pointer; font-family: var(--font-body); }
-
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: white; padding: 10px 20px; border-radius: 100px; font-size: 13px; z-index: 300; transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .fade-in { animation: fadeIn 0.4s ease both; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
-
     @media(max-width: 900px) { .content-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
     @media(max-width: 600px) { .hero { padding: 28px 16px 20px; } .controls-bar, .status-bar, .search-bar-inline { padding: 12px 16px; } .content-layout { padding: 20px 16px 60px; } .news-card { padding: 18px 14px; gap: 14px; } .nav-date { display: none; } .nav-ticker { display: none; } }
   </style>
@@ -168,10 +153,10 @@
     <button class="pill" data-loc="Ekonomi">📊 Ekonomi</button>
     <button class="pill" data-loc="Teknoloji">💻 Teknoloji</button>
     <button class="pill" data-loc="Spor">⚽ Spor</button>
+    <button class="pill" data-loc="Kültür Sanat">🎭 Kültür Sanat</button>
   </div>
 </div>
 
-<!-- INLINE SEARCH -->
 <div class="search-bar-inline">
   <div class="search-bar-inner">
     <span class="search-bar-icon">🔍</span>
@@ -222,10 +207,13 @@
   const SOURCE_DOMAINS = {
     'NTV': 'ntv.com.tr', 'NTV Dünya': 'ntv.com.tr', 'NTV Gündem': 'ntv.com.tr', 'NTV Teknoloji': 'ntv.com.tr',
     'Hürriyet': 'hurriyet.com.tr', 'Hürriyet Dünya': 'hurriyet.com.tr', 'Hürriyet Spor': 'hurriyet.com.tr', 'Hürriyet Ekonomi': 'hurriyet.com.tr',
-    'DW Türkçe': 'dw.com', 'TRT Haber': 'trthaber.com',
-    'Sabah': 'sabah.com.tr', 'Sabah SD': 'sabah.com.tr',
-    'Milliyet': 'milliyet.com.tr', 'Cumhuriyet': 'cumhuriyet.com.tr', 'Haberturk': 'haberturk.com',
-    'Bloomberg HT': 'bloomberght.com', 'Sözcü Spor': 'sozcu.com.tr',
+    'DW Türkçe': 'dw.com', 'TRT Haber': 'trthaber.com', 'TRT Spor': 'trthaber.com', 'TRT K&S': 'trthaber.com',
+    'Sabah': 'sabah.com.tr', 'Sabah SD': 'sabah.com.tr', 'Sabah Spor': 'sabah.com.tr', 'Sabah K&S': 'sabah.com.tr',
+    'Milliyet': 'milliyet.com.tr', 'Cumhuriyet': 'cumhuriyet.com.tr', 'Cumhuriyet Spor': 'cumhuriyet.com.tr', 'Cumhuriyet K&S': 'cumhuriyet.com.tr',
+    'Haberturk': 'haberturk.com', 'Haberturk Spor': 'haberturk.com', 'Haberturk K&S': 'haberturk.com',
+    'Bloomberg HT': 'bloomberght.com',
+    'Sözcü Spor': 'sozcu.com.tr', 'Sözcü K&S': 'sozcu.com.tr',
+    'A Spor': 'aspor.com.tr',
     'Webtekno': 'webtekno.com', 'ShiftDelete': 'shiftdelete.net',
   };
 
@@ -234,33 +222,30 @@
     return d ? `https://www.google.com/s2/favicons?domain=${d}&sz=32` : null;
   }
 
-function timeAgo(pubDate) {
-  if (!pubDate) return null;
-  let date;
-  try {
-    // Önce standart parse dene
-    const cleaned = pubDate.trim().replace(/\s+Z$/i, 'Z').replace(/\s{2,}/g, ' ');
-    date = new Date(cleaned);
-    // Safari bazı RFC 822 formatlarını parse edemiyor, manuel parse
-    if (isNaN(date.getTime())) {
-      // "Thu, 19 Mar 2026 11:07:00 Z" veya "Thu, 19 Mar 2026 11:07:00 +0300"
-      const m = cleaned.match(/(\d{1,2})\s+(\w{3})\s+(\d{4})\s+(\d{2}):(\d{2}):(\d{2})\s*(Z|[+-]\d{4})?/);
-      if (m) {
-        const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-        const tz = m[7] || 'Z';
-        const offsetMin = tz === 'Z' ? 0 : (parseInt(tz.slice(0,3))*60 + parseInt(tz.slice(0,1)+tz.slice(3)));
-        date = new Date(Date.UTC(+m[3], months[m[2]], +m[1], +m[4], +m[5]-offsetMin, +m[6]));
+  function timeAgo(pubDate) {
+    if (!pubDate) return null;
+    let date;
+    try {
+      const cleaned = pubDate.trim().replace(/\s+Z$/i, 'Z').replace(/\s{2,}/g, ' ');
+      date = new Date(cleaned);
+      if (isNaN(date.getTime())) {
+        const m = cleaned.match(/(\d{1,2})\s+(\w{3})\s+(\d{4})\s+(\d{2}):(\d{2}):(\d{2})\s*(Z|[+-]\d{4})?/);
+        if (m) {
+          const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+          const tz = m[7] || 'Z';
+          const offsetMin = tz === 'Z' ? 0 : (parseInt(tz.slice(0,3))*60 + parseInt(tz.slice(0,1)+tz.slice(3)));
+          date = new Date(Date.UTC(+m[3], months[m[2]], +m[1], +m[4], +m[5]-offsetMin, +m[6]));
+        }
       }
-    }
-  } catch(e) { return null; }
-  if (!date || isNaN(date.getTime())) return null;
-  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
-  if (mins < 1) return 'Az önce';
-  if (mins < 60) return `${mins} dk önce`;
-  const h = Math.floor(mins / 60);
-  if (h < 24) return `${h} saat önce`;
-  return `${Math.floor(h / 24)} gün önce`;
-}
+    } catch(e) { return null; }
+    if (!date || isNaN(date.getTime())) return null;
+    const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+    if (mins < 1) return 'Az önce';
+    if (mins < 60) return `${mins} dk önce`;
+    const h = Math.floor(mins / 60);
+    if (h < 24) return `${h} saat önce`;
+    return `${Math.floor(h / 24)} gün önce`;
+  }
 
   function highlight(text, q) {
     if (!q || !text) return text;
@@ -280,7 +265,6 @@ function timeAgo(pubDate) {
     loadNews();
   });
 
-  // ── INLINE SEARCH ──
   document.getElementById('search-bar-input').addEventListener('input', function() {
     clearTimeout(searchTimeout);
     const q = this.value.trim();
@@ -349,7 +333,10 @@ function timeAgo(pubDate) {
     setStatus('updating', 'Güncelleniyor...');
     document.getElementById('main-content').innerHTML = `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
     try {
-      const locMap = { 'Gündem': 'Gundem', 'Dünya': 'Dunya', 'Ekonomi': 'Ekonomi', 'Spor': 'Spor', 'Teknoloji': 'Teknoloji' };
+      const locMap = {
+        'Gündem': 'Gundem', 'Dünya': 'Dunya', 'Ekonomi': 'Ekonomi',
+        'Spor': 'Spor', 'Teknoloji': 'Teknoloji', 'Kültür Sanat': 'KulturSanat'
+      };
       const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
