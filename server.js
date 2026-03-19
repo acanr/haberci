@@ -29,8 +29,14 @@ const RSS_SOURCES = {
     { name: 'Hürriyet Ekonomi', url: 'https://www.hurriyet.com.tr/rss/ekonomi', weight: 1.0 },
     { name: 'Bloomberg HT',     url: 'https://www.bloomberght.com/rss',          weight: 1.3 },
   ],
-  'Spor': [
-    { name: 'Hürriyet Spor', url: 'https://www.hurriyet.com.tr/rss/spor',  weight: 1.0 },
+ 'Spor': [
+    { name: 'Hürriyet Spor',   url: 'https://www.hurriyet.com.tr/rss/spor',          weight: 1.0 },
+    { name: 'Sözcü Spor',      url: 'https://www.sozcu.com.tr/rss/spor.xml',         weight: 1.0 },
+    { name: 'A Spor',          url: 'https://www.aspor.com.tr/rss/anasayfa.xml',     weight: 1.0 },
+    { name: 'TRT Spor',        url: 'https://www.trthaber.com/spor_articles.rss',    weight: 1.0 },
+    { name: 'Sabah Spor',      url: 'https://www.sabah.com.tr/rss/spor.xml',         weight: 1.0 },
+    { name: 'Haberturk Spor',  url: 'https://www.haberturk.com/rss/spor.xml',       weight: 1.0 },
+    { name: 'Cumhuriyet Spor', url: 'https://www.cumhuriyet.com.tr/rss/spor',        weight: 1.0 },
   ],
   'Teknoloji': [
     { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss', weight: 1.2 },
