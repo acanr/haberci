@@ -55,9 +55,12 @@ const CLICKBAIT_KEYWORDS = [
 ];
 
 const IMPORTANCE_KEYWORDS = {
-  'deprem': 20,'yangın': 20, 'patlama': 25,
+  'deprem': 20, 'yangın': 20, 'patlama': 25,
   'hayatını kaybetti': 20, 'öldü': 15, 'yaralı': 10,
-  'saldırı': 30, 'kriz': 10,
+  'hava saldırısı': 35, 'füze saldırısı': 35, 'bombalı saldırı': 35,
+  'silahlı saldırı': 30, 'terör saldırısı': 30,
+  'saldırı': 10,
+  'kriz': 10,
   'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,
   'görevden alma': 20, 'görevden alındı': 20,
   'istifa': 15, 'ihraç': 15,
