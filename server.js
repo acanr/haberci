@@ -64,7 +64,7 @@ const IMPORTANCE_KEYWORDS = {
   'tutuklama': 20, 'tutuklandı': 20, 'gözaltı': 15,
   'görevden alma': 20, 'görevden alındı': 20,
   'istifa': 15, 'ihraç': 15,
-  'cumhurbaşkan': 15, 'meclis': 12, 'seçim': 15, 'hükümet': 10,
+  'cumhurbaşkan': 20, 'meclis': 12, 'seçim': 15, 'hükümet': 10,
   'merkez bankası': 15, 'faiz': 12, 'dolar': 10, 'borsa': 10, 'enflasyon': 12,
   'şampiyon': 10, 'gol': 8, 'maç': 8,
   'yapay zeka': 0, 'iphone': 0, 'tesla': 0,
@@ -188,7 +188,8 @@ function clusterNews(items) {
 }
 
 function clusterBonus(clusterSize) {
-  if (clusterSize >= 5) return 60;
+  if (clusterSize >= 6) return 70;
+  if (clusterSize == 5) return 60;
   if (clusterSize == 4) return 50;
   if (clusterSize === 3) return 40;
   if (clusterSize === 2) return 25;
