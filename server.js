@@ -213,7 +213,7 @@ function scoreItem(item, clusterSize, location) {
   else if (ageHours < 6)  score += 10;
   else if (ageHours < 12) score += 5;
   else if (ageHours < 24) score += 0;
-  else if (ageHours < 36) score -= 10;
+  else if (ageHours < 36) score -= 50;
   score += Math.round((item.sourceWeight || 1.0) * 5);
   score += clusterBonus(clusterSize);
   if (location === 'Gundem') {
