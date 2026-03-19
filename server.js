@@ -213,7 +213,8 @@ function scoreItem(item, clusterSize, location) {
   else if (ageHours < 6)  score += 10;
   else if (ageHours < 12) score += 5;
   else if (ageHours < 24) score += 0;
-  else if (ageHours < 36) score -= 50;
+  else if (ageHours < 36) score -= 10;
+  else                    score -= 50;
   score += Math.round((item.sourceWeight || 1.0) * 5);
   score += clusterBonus(clusterSize);
   if (location === 'Gundem') {
@@ -262,14 +263,17 @@ async function fetchNews(location) {
     return { ...representative, score, clusterSize: size, sourceCount: uniqueSources.length, allSources: uniqueSources };
   });
 
-  const sorted = location === 'Ekonomi'
-    ? scored.sort((a, b) => getItemAge(a) - getItemAge(b))
-    : scored.sort((a, b) => b.score - a.score);
+  // Gündem → puan sıralaması, diğerleri → kronolojik (en yeni üstte)
+  const sorted = location === 'Gundem'
+    ? scored.sort((a, b) => b.score - a.score)
+    : scored.sort((a, b) => getItemAge(a) - getItemAge(b));
 
   console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize}src)`).join(' | ')}`);
 
-  // Top 10 kullanıcıya gösterilir
-  const news = sorted.slice(0, 10).map((item, i) => ({
+  // Gündem → 10 haber, diğerleri → 20 haber
+  const limit = location === 'Gundem' ? 10 : 20;
+
+  const news = sorted.slice(0, limit).map((item, i) => ({
     rank: i + 1,
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
@@ -282,7 +286,6 @@ async function fetchNews(location) {
     pubDate: item.pubDate,
   }));
 
-  // Tüm haberler search için cache'e kaydedilir (max 100)
   const allNews = sorted.slice(0, 100).map(item => ({
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
@@ -333,16 +336,13 @@ app.get('/api/news', async function(req, res) {
   }
 });
 
-// SEARCH endpoint — tüm kategorilerdeki cache'li haberler içinde arama
 app.get('/api/search', async function(req, res) {
   const q = (req.query.q || '').toLowerCase().trim();
   if (!q || q.length < 2) {
     return res.status(400).json({ error: 'En az 2 karakter girin', results: [] });
   }
-
   const results = [];
   const seen = new Set();
-
   for (const loc of LOCATIONS) {
     const cached = cache.get(loc);
     if (!cached?.allNews) continue;
@@ -354,15 +354,8 @@ app.get('/api/search', async function(req, res) {
       }
     }
   }
-
-  // Skora göre sırala
   results.sort((a, b) => (b.score || 0) - (a.score || 0));
-
-  res.json({
-    query: q,
-    count: results.length,
-    results: results.slice(0, 50),
-  });
+  res.json({ query: q, count: results.length, results: results.slice(0, 50) });
 });
 
 app.get('/api/status', function(req, res) {
