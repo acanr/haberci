@@ -234,18 +234,18 @@
     return d ? `https://www.google.com/s2/favicons?domain=${d}&sz=32` : null;
   }
 
-  function timeAgo(pubDate) {
-    if (!pubDate) return null;
-    const cleaned = pubDate.trim().replace(/\s{2,}/g, ' ').replace(/\s+Z$/i, 'Z');
-    const date = new Date(cleaned);
-    if (isNaN(date.getTime())) return null;
-    const mins = Math.floor((Date.now() - date.getTime()) / 60000);
-    if (mins < 1) return 'Az önce';
-    if (mins < 60) return `${mins} dk önce`;
-    const h = Math.floor(mins / 60);
-    if (h < 24) return `${h} saat önce`;
-    return `${Math.floor(h / 24)} gün önce`;
-  }
+function timeAgo(pubDate) {
+  if (!pubDate) return null;
+  const cleaned = pubDate.trim().replace(/\s+Z$/i, 'Z').replace(/\s{2,}/g, ' ');
+  const date = new Date(cleaned);
+  if (isNaN(date.getTime())) return null;
+  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (mins < 1) return 'Az önce';
+  if (mins < 60) return `${mins} dk önce`;
+  const h = Math.floor(mins / 60);
+  if (h < 24) return `${h} saat önce`;
+  return `${Math.floor(h / 24)} gün önce`;
+}
 
   function highlight(text, q) {
     if (!q || !text) return text;
