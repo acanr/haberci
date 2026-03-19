@@ -6,7 +6,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const LOCATIONS = ['Gundem', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji'];
+const LOCATIONS = ['Gundem', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'KulturSanat'];
 
 const RSS_SOURCES = {
   'Gundem': [
@@ -39,9 +39,16 @@ const RSS_SOURCES = {
     { name: 'Cumhuriyet Spor', url: 'https://www.cumhuriyet.com.tr/rss/spor',        weight: 1.0 },
   ],
   'Teknoloji': [
-    { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss', weight: 1.2 },
+    { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss', weight: 1.0 },
     { name: 'Webtekno',      url: 'https://www.webtekno.com/rss.xml',      weight: 1.0 },
     { name: 'ShiftDelete',   url: 'https://shiftdelete.net/feed',          weight: 1.0 },
+  ],
+  'KulturSanat': [
+    { name: 'Cumhuriyet K&S',  url: 'https://www.cumhuriyet.com.tr/rss/kultur-sanat',                       weight: 1.0 },
+    { name: 'Sözcü K&S',       url: 'https://www.sozcu.com.tr/feeds-rss-category-kultur-sanat',             weight: 1.0 },
+    { name: 'TRT K&S',         url: 'https://www.trthaber.com/kultur_sanat_articles.rss',                   weight: 1.0 },
+    { name: 'Haberturk K&S',   url: 'https://www.haberturk.com/rss/kategori/kultur-sanat.xml',              weight: 1.0 },
+    { name: 'Sabah K&S',       url: 'https://www.sabah.com.tr/rss/kultur-sanat.xml',                        weight: 1.0 },
   ],
 };
 
@@ -242,6 +249,7 @@ function guessCategory(title, desc, loc) {
   if (loc === 'Spor') return 'Spor';
   if (loc === 'Ekonomi') return 'Ekonomi';
   if (loc === 'Teknoloji') return 'Teknoloji';
+  if (loc === 'KulturSanat') return 'Kültür Sanat';
   if (loc === 'Dunya') return 'Dünya';
   return 'Gündem';
 }
