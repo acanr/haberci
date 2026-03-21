@@ -38,10 +38,14 @@ const RSS_SOURCES = {
     { name: 'Haberturk Spor',  url: 'https://www.haberturk.com/rss/spor.xml',       weight: 1.0 },
     { name: 'Cumhuriyet Spor', url: 'https://www.cumhuriyet.com.tr/rss/spor',        weight: 1.0 },
   ],
-  'Teknoloji': [
-    { name: 'NTV Teknoloji', url: 'https://www.ntv.com.tr/teknoloji.rss', weight: 1.0 },
-    { name: 'Webtekno',      url: 'https://www.webtekno.com/rss.xml',      weight: 1.0 },
-    { name: 'ShiftDelete',   url: 'https://shiftdelete.net/feed',          weight: 1.0 },
+'Teknoloji': [
+    { name: 'NTV Teknoloji',      url: 'https://www.ntv.com.tr/teknoloji.rss',                    weight: 1.2 },
+    { name: 'Webtekno',           url: 'https://www.webtekno.com/rss.xml',                         weight: 1.0 },
+    { name: 'ShiftDelete',        url: 'https://shiftdelete.net/feed',                             weight: 1.0 },
+    { name: 'Chip TR',            url: 'https://www.chip.com.tr/rss',                              weight: 1.0 },
+    { name: 'Milliyet Teknoloji', url: 'https://www.milliyet.com.tr/rss/rssnew/teknolojirss.xml',  weight: 1.0 },
+    { name: 'Haberturk Teknoloji',url: 'https://www.haberturk.com/rss/teknoloji.xml',              weight: 1.0 },
+    { name: 'Log.com.tr',         url: 'https://www.log.com.tr/feed/',                             weight: 1.0 },
   ],
   'KulturSanat': [
     { name: 'Cumhuriyet K&S',  url: 'https://www.cumhuriyet.com.tr/rss/kultur-sanat',                       weight: 1.0 },
