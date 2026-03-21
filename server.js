@@ -94,6 +94,9 @@ const STOP_WORDS = new Set([
   'ama', 'çok', 'en', 'mi', 'ne', 'ki', 'the', 'a', 'an', 'in', 'on',
   'at', 'to', 'of', 'is', 'was', 'are', 'oldu', 'etti', 'var', 'yok',
   'son', 'ilk', 'yeni', 'büyük', 'küçük', 'açıkladı', 'dedi', 'geldi',
+  // Mevsimsel / genel kelimeler — cluster yanlış birleştirmesin
+  'bayram', 'kutlama', 'kutladı', 'tebrik', 'mesaj', 'nevruz', 'ramazan',
+  'kurban', 'yılbaşı', 'töreni', 'toplantı', 'ziyaret', 'açılış',
 ]);
 
 const cache = new Map();
