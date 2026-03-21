@@ -389,6 +389,61 @@ app.get('/api/status', function(req, res) {
   });
 });
 
+// Supabase config
+const SUPABASE_URL = 'https://wrxjeywvpjjbmksrmvzz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_bHrUMbP1Bl52bxg4bIyazw_PeTGgYkH';
+
+// Kullanıcı token + keyword kaydet / güncelle
+app.post('/api/register', async function(req, res) {
+  const { deviceToken, keywords = [], categories = [] } = req.body;
+  if (!deviceToken) return res.status(400).json({ error: 'deviceToken gerekli' });
+
+  try {
+    const fetch = require('node-fetch');
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/user_preferences`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        device_token: deviceToken,
+        keywords,
+        categories,
+        updated_at: new Date().toISOString()
+      })
+    });
+    if (!response.ok) throw new Error(await response.text());
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[REGISTER]', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Kullanıcı tercihlerini getir
+app.get('/api/preferences/:token', async function(req, res) {
+  const token = req.params.token;
+  try {
+    const fetch = require('node-fetch');
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/user_preferences?device_token=eq.${encodeURIComponent(token)}&select=keywords,categories`,
+      {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+    const data = await response.json();
+    res.json(data[0] || { keywords: [], categories: [] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/hakkimizda', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'hakkimizda.html'));
 });
