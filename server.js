@@ -650,38 +650,21 @@ app.get('/api/cron/tweet', async function(req, res) {
 
     // AI brifing üret
     const briefing = await generateBriefing(data.news, 'Gundem');
-    const tweets = [];
 
-    // Tweet 1: Gündem özeti
-    if (briefing?.text) {
-      const briefingTweet = `📰 Gündemin Özeti\n\n${briefing.text.slice(0, 220)}\n\n🔗 haberimvar.app`;
-      try {
-        const result = await twitterClient.v2.tweet(briefingTweet);
-        tweets.push({ type: 'briefing', id: result.data.id });
-        console.log('[TWEET] Brifing paylaşıldı:', result.data.id);
-      } catch (err) {
-        console.error('[TWEET ERROR] Brifing:', err.message);
-      }
+    if (!briefing?.text) {
+      return res.json({ success: false, error: 'Brifing üretilemedi' });
     }
 
-    // Tweet 2-4: Top 3 haber (her biri ayrı tweet)
-    const topNews = data.news.slice(0, 3);
-    for (const item of topNews) {
-      const sourcesText = item.sourceCount > 1 ? `${item.sourceCount} kaynak` : (item.sources?.[0] || '');
-      const tweetText = `🔴 ${item.headline.slice(0, 200)}\n\n${sourcesText}\n\n💡 AI analizi → haberimvar.app\n\n#gündem #haberler`;
-      
-      try {
-        // Rate limit aşmamak için 2 saniye bekle
-        await new Promise(r => setTimeout(r, 2000));
-        const result = await twitterClient.v2.tweet(tweetText);
-        tweets.push({ type: 'news', id: result.data.id, headline: item.headline.slice(0, 50) });
-        console.log('[TWEET] Haber paylaşıldı:', item.headline.slice(0, 40));
-      } catch (err) {
-        console.error('[TWEET ERROR] Haber:', err.message);
-      }
-    }
+    // Tarih formatı
+    const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
 
-    res.json({ success: true, tweeted: tweets.length, tweets });
+    // Tek tweet: Gündem özeti + hashtag
+    const tweetText = `📰 Gündemin Özeti | ${today}\n\n${briefing.text.slice(0, 200)}\n\n15+ kaynaktan, yapay zeka ile derlendi\n🔗 haberimvar.app\n\n#gündem #haberler`;
+
+    const result = await twitterClient.v2.tweet(tweetText);
+    console.log('[TWEET] Gündem özeti paylaşıldı:', result.data.id);
+
+    res.json({ success: true, tweeted: 1, tweetId: result.data.id });
   } catch (err) {
     console.error('[TWEET CRON ERROR]', err.message);
     res.status(500).json({ success: false, error: err.message });
