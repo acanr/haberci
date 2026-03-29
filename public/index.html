@@ -160,6 +160,60 @@
       background: rgba(0,0,0,0.03);
       border-radius: 100px;
     }
+
+    /* ── Neden Önemli ─────────────────────────────── */
+    .explain-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .explain-btn:hover {
+      background: #fef9f0;
+      border-color: #e6a817;
+      color: #b8860b;
+    }
+    .explain-btn.loading {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .explain-panel {
+      margin-top: 14px;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, #fefcf7 0%, #fef9f0 100%);
+      border: 1px solid #f0e0b8;
+      border-radius: 10px;
+      animation: fadeIn 0.3s ease both;
+    }
+    .explain-panel-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .explain-panel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--ink-4);
+      margin-top: 10px;
+    }
+    .explain-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border-strong);
+      border-top-color: #b8860b;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
     .sidebar { position: sticky; top: 80px; }
     .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
@@ -522,7 +576,7 @@
       }).join('');
       const extraChip = extraCount > 0 ? `<span class="source-chip-more">+${extraCount}</span>` : '';
       const timeChip = ago ? `<span class="time-badge">${ago}</span>` : '';
-      html += `<button class="news-card fade-in" style="animation-delay:${i*40}ms" onclick="openNews(${i})">
+      html += `<div class="news-card fade-in" style="animation-delay:${i*40}ms" onclick="openNews(${i})">
         <div class="rank-num">${rankStr(item)}</div>
         <div class="news-body">
           <div class="news-meta">
@@ -532,10 +586,15 @@
           </div>
           <div class="news-headline">${item.headline}</div>
           <div class="news-summary">${item.summary}</div>
-          <div class="news-footer">${sourceChips}${extraChip}${timeChip}</div>
+          <div class="news-footer">
+            ${sourceChips}${extraChip}
+            <button class="explain-btn" onclick="event.stopPropagation(); explainNews(${i}, this)" title="Bu haber neden önemli?">💡 Neden Önemli?</button>
+            ${timeChip}
+          </div>
+          <div class="explain-panel" id="explain-${i}" style="display:none;"></div>
         </div>
         <div class="news-arrow">→</div>
-      </button>`;
+      </div>`;
     });
     html += '</div>';
     main.innerHTML = html;
@@ -575,6 +634,55 @@
   function openNews(idx) {
     const item = window._newsData?.[idx];
     if (item?.link) window.open(item.link, '_blank', 'noopener');
+  }
+
+  async function explainNews(idx, btn) {
+    const item = window._newsData?.[idx];
+    if (!item) return;
+
+    const panel = document.getElementById('explain-' + idx);
+    
+    // Toggle — zaten açıksa kapat
+    if (panel.style.display === 'block' && panel.dataset.loaded === 'true') {
+      panel.style.display = 'none';
+      btn.innerHTML = '💡 Neden Önemli?';
+      return;
+    }
+
+    // Loading state
+    btn.classList.add('loading');
+    btn.innerHTML = '<div class="explain-spinner"></div> Analiz ediliyor...';
+    panel.style.display = 'block';
+    panel.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--ink-3);font-size:13px;"><div class="explain-spinner"></div> Yapay zeka haberi analiz ediyor...</div>';
+
+    try {
+      const res = await fetch('/api/explain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          headline: item.headline,
+          summary: item.summary || ''
+        })
+      });
+      const data = await res.json();
+
+      if (data.text) {
+        panel.innerHTML = `
+          <div class="explain-panel-text">${data.text}</div>
+          <div class="explain-panel-badge">✨ AI analizi</div>
+        `;
+        panel.dataset.loaded = 'true';
+        btn.innerHTML = '💡 Gizle';
+      } else {
+        panel.innerHTML = '<div style="font-size:13px;color:var(--ink-3);">Analiz üretilemedi, lütfen tekrar deneyin.</div>';
+        btn.innerHTML = '💡 Neden Önemli?';
+      }
+    } catch (err) {
+      panel.innerHTML = '<div style="font-size:13px;color:var(--accent);">Bağlantı hatası, lütfen tekrar deneyin.</div>';
+      btn.innerHTML = '💡 Neden Önemli?';
+    }
+
+    btn.classList.remove('loading');
   }
 
   function openModal() { document.getElementById('modal').classList.add('open'); }
