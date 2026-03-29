@@ -82,6 +82,84 @@
     .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
     .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
     .search-highlight { background: #fff3cd; border-radius: 2px; padding: 0 2px; }
+    
+    /* ── Günün Brifingi ───────────────────────────── */
+    .briefing-card {
+      background: linear-gradient(135deg, #fafaf8 0%, #f5f3ef 100%);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 28px 30px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .briefing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: linear-gradient(180deg, var(--accent) 0%, #e67e22 100%);
+      border-radius: 4px 0 0 4px;
+    }
+    .briefing-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .briefing-icon {
+      width: 32px; height: 32px;
+      background: var(--accent-soft);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .briefing-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .briefing-sublabel {
+      font-size: 11px;
+      color: var(--ink-4);
+      margin-left: auto;
+    }
+    .briefing-text {
+      font-family: var(--font-body);
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: var(--ink);
+      font-weight: 400;
+    }
+    .briefing-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .briefing-skeleton-line {
+      height: 14px;
+      background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-2) 50%, var(--surface-3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease infinite;
+      border-radius: 6px;
+    }
+    .briefing-skeleton-line:nth-child(1) { width: 100%; }
+    .briefing-skeleton-line:nth-child(2) { width: 92%; }
+    .briefing-skeleton-line:nth-child(3) { width: 75%; }
+    @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+    .briefing-ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--ink-4);
+      margin-top: 14px;
+      padding: 3px 8px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 100px;
+    }
     .sidebar { position: sticky; top: 80px; }
     .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
@@ -108,7 +186,7 @@
     .fade-in { animation: fadeIn 0.4s ease both; }
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
     @media(max-width: 900px) { .content-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
-    @media(max-width: 600px) { .hero { padding: 28px 16px 20px; } .controls-bar, .status-bar, .search-bar-inline { padding: 12px 16px; } .content-layout { padding: 20px 16px 60px; } .news-card { padding: 18px 14px; gap: 14px; } .nav-date { display: none; } .nav-ticker { display: none; } }
+    @media(max-width: 600px) { .hero { padding: 28px 16px 20px; } .controls-bar, .status-bar, .search-bar-inline { padding: 12px 16px; } .content-layout { padding: 20px 16px 60px; } .news-card { padding: 18px 14px; gap: 14px; } .nav-date { display: none; } .nav-ticker { display: none; } .briefing-card { padding: 20px 18px; margin-bottom: 18px; } .briefing-text { font-size: 14.5px; line-height: 1.7; } }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1BSW710W"></script>
@@ -137,7 +215,7 @@
 <div class="hero">
   <div class="hero-eyebrow">Yapay Zeka Destekli · Her 15 Dakika Güncellenir</div>
   <h1 class="hero-title">Günün en önemli<br><em>10 haberi.</em></h1>
-  <p class="hero-sub">Türkiye ve dünyadan haberler toplanır, önem sırasına göre sıralanır.</p>
+  <p class="hero-sub">Türkiye ve dünyadan haberler toplanır, önem sırasına göre sıralanır. Yapay zeka günü özetler.</p>
 </div>
 
 <div class="status-bar">
@@ -166,9 +244,27 @@
 </div>
 
 <div class="content-layout">
-  <main id="main-content">
-    <div class="loading-wrap"><div class="loader"></div><div class="loading-label">Haberler yükleniyor...</div></div>
-  </main>
+  <div style="display:flex;flex-direction:column;min-width:0;">
+    <!-- Günün Brifingi -->
+    <div class="briefing-card" id="briefing-card" style="display:none;">
+      <div class="briefing-header">
+        <div class="briefing-icon">⚡</div>
+        <span class="briefing-label">Günün Brifingi</span>
+        <span class="briefing-sublabel" id="briefing-time"></span>
+      </div>
+      <div id="briefing-content">
+        <div class="briefing-skeleton">
+          <div class="briefing-skeleton-line"></div>
+          <div class="briefing-skeleton-line"></div>
+          <div class="briefing-skeleton-line"></div>
+        </div>
+      </div>
+    </div>
+    
+    <main id="main-content">
+      <div class="loading-wrap"><div class="loader"></div><div class="loading-label">Haberler yükleniyor...</div></div>
+    </main>
+  </div>
   <aside class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-title">📰 Kaynaklarda Öne Çıkanlar</div>
@@ -337,17 +433,77 @@
         'Gündem': 'Gundem', 'Dünya': 'Dunya', 'Ekonomi': 'Ekonomi',
         'Spor': 'Spor', 'Teknoloji': 'Teknoloji', 'Kültür Sanat': 'KulturSanat'
       };
-      const res = await fetch(`/api/news?loc=${locMap[currentLoc] || currentLoc}`);
+      const apiLoc = locMap[currentLoc] || currentLoc;
+      const res = await fetch(`/api/news?loc=${apiLoc}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       renderNews(data);
       renderSidebar(data.news);
       startCountdown(data.nextUpdateIn || 900);
       setStatus('live', `Son güncelleme: az önce · ${data.articleCount} haber tarandı`);
+      
+      // Brifing render
+      if (data.briefing?.text) {
+        renderBriefing(data.briefing);
+      } else {
+        // Brifing henüz hazır değil — skeleton göster ve polling başlat
+        showBriefingSkeleton();
+        pollBriefing(apiLoc);
+      }
     } catch (err) {
       document.getElementById('main-content').innerHTML = `<div class="error-wrap">Haberler yüklenemedi: ${err.message}</div>`;
       setStatus('', 'Bağlantı hatası');
     }
+  }
+
+  function renderBriefing(briefing) {
+    const card = document.getElementById('briefing-card');
+    const content = document.getElementById('briefing-content');
+    const timeEl = document.getElementById('briefing-time');
+    
+    card.style.display = 'block';
+    content.innerHTML = `
+      <div class="briefing-text">${briefing.text}</div>
+      <div class="briefing-ai-badge">✨ AI tarafından ${briefing.newsCount || 10} haberden üretildi</div>
+    `;
+    
+    if (briefing.generatedAt) {
+      const ago = Math.round((Date.now() - briefing.generatedAt) / 60000);
+      timeEl.textContent = ago < 1 ? 'Az önce güncellendi' : `${ago} dk önce`;
+    }
+  }
+
+  function showBriefingSkeleton() {
+    const card = document.getElementById('briefing-card');
+    const content = document.getElementById('briefing-content');
+    card.style.display = 'block';
+    content.innerHTML = `
+      <div class="briefing-skeleton">
+        <div class="briefing-skeleton-line"></div>
+        <div class="briefing-skeleton-line"></div>
+        <div class="briefing-skeleton-line"></div>
+      </div>
+    `;
+  }
+
+  let briefingPollTimer = null;
+  function pollBriefing(loc, attempts) {
+    attempts = attempts || 0;
+    if (attempts > 8) return; // Max 8 deneme (40 saniye)
+    clearTimeout(briefingPollTimer);
+    briefingPollTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/briefing?loc=${loc}`);
+        const data = await res.json();
+        if (data?.text) {
+          renderBriefing(data);
+        } else {
+          pollBriefing(loc, attempts + 1);
+        }
+      } catch(e) {
+        pollBriefing(loc, attempts + 1);
+      }
+    }, 5000); // 5 saniyede bir kontrol
   }
 
   function renderNews(data) {
