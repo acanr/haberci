@@ -1,10 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const Anthropic = require('@anthropic-ai/sdk');
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Claude API client for briefing generation
+const anthropic = new Anthropic();
+const briefingCache = new Map();
 
 const LOCATIONS = ['Gundem', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'KulturSanat'];
 
@@ -333,6 +338,78 @@ async function fetchNews(location) {
   };
 }
 
+// ── Günün Brifingi: AI ile haber özeti üretimi ──────────────────────
+async function generateBriefing(newsItems, location) {
+  if (!newsItems || newsItems.length === 0) return null;
+  
+  const cacheKey = `briefing_${location}`;
+  const cached = briefingCache.get(cacheKey);
+  // Brifing cache'i 15 dakika geçerli (haberlerle senkron)
+  if (cached && (Date.now() - cached.generatedAt) < 15 * 60 * 1000) {
+    return cached;
+  }
+
+  const today = new Date().toLocaleDateString('tr-TR', {
+    day: 'numeric', month: 'long', year: 'numeric', weekday: 'long'
+  });
+
+  const locationNames = {
+    'Gundem': 'Türkiye Gündemi',
+    'Dunya': 'Dünya',
+    'Ekonomi': 'Ekonomi',
+    'Spor': 'Spor',
+    'Teknoloji': 'Teknoloji',
+    'KulturSanat': 'Kültür Sanat'
+  };
+
+  const newsText = newsItems.slice(0, 10).map((item, i) =>
+    `${i + 1}. ${item.headline}${item.summary ? ' — ' + item.summary.slice(0, 150) : ''}`
+  ).join('\n');
+
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 400,
+      messages: [{
+        role: 'user',
+        content: `Bugün ${today}. Aşağıda ${locationNames[location] || 'Gündem'} kategorisindeki en önemli haberler var.
+
+Bu haberlerden yola çıkarak "Günün Brifingi" yaz. Kurallar:
+- TAM OLARAK 2-3 cümle yaz, fazla değil
+- Doğal, akıcı Türkçe kullan — haber bülteni gibi değil, zeki bir arkadaşın sabah özetlemesi gibi
+- En önemli 2-3 gelişmeyi birbirine bağlayarak anlat
+- Başlık veya kaynak adı yazma, sadece özet paragraf
+- "Bugün" veya "Gündemde" ile başlama, doğrudan konuya gir
+
+Haberler:
+${newsText}`
+      }],
+    });
+
+    const briefingText = message.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim();
+
+    const briefing = {
+      text: briefingText,
+      location,
+      generatedAt: Date.now(),
+      newsCount: newsItems.length,
+    };
+
+    briefingCache.set(cacheKey, briefing);
+    console.log(`[BRIEFING] ${location}: "${briefingText.slice(0, 80)}..."`);
+    return briefing;
+  } catch (err) {
+    console.error(`[BRIEFING ERROR] ${location}:`, err.message);
+    // Hata durumunda eski cache'i döndür
+    if (cached) return cached;
+    return null;
+  }
+}
+
 app.get('/api/news', async function(req, res) {
   const loc = req.query.loc || 'Gundem';
   if (!LOCATIONS.includes(loc)) {
@@ -340,8 +417,11 @@ app.get('/api/news', async function(req, res) {
   }
   const cached = cache.get(loc);
   if (cached && (Date.now() - cached.updatedAt) < 15 * 60 * 1000) {
+    // Cache geçerli — brifing varsa ekle
+    const briefing = briefingCache.get(`briefing_${loc}`);
     return res.json({
       ...cached,
+      briefing: briefing || null,
       cacheAge: Math.round((Date.now() - cached.updatedAt) / 1000),
       nextUpdateIn: Math.max(0, Math.round((cached.updatedAt + 900000 - Date.now()) / 1000)),
     });
@@ -349,12 +429,43 @@ app.get('/api/news', async function(req, res) {
   try {
     const data = await fetchNews(loc);
     cache.set(loc, data);
-    res.json(data);
+    
+    // Brifing üretimini arka planda başlat (response'u bekletme)
+    generateBriefing(data.news, loc).catch(err => 
+      console.error('[BRIEFING BG]', err.message)
+    );
+    
+    // Mevcut brifing cache'i varsa ekle (bir önceki döngüden)
+    const briefing = briefingCache.get(`briefing_${loc}`);
+    res.json({ ...data, briefing: briefing || null });
   } catch (err) {
     console.error('[ERROR]', err.message);
     if (cached) return res.json(cached);
     res.status(503).json({ error: err.message });
   }
+});
+
+// Brifing endpoint — frontend polling için
+app.get('/api/briefing', async function(req, res) {
+  const loc = req.query.loc || 'Gundem';
+  if (!LOCATIONS.includes(loc)) {
+    return res.status(400).json({ error: 'Geçersiz lokasyon' });
+  }
+  const briefing = briefingCache.get(`briefing_${loc}`);
+  if (briefing) {
+    return res.json(briefing);
+  }
+  // Cache'de brifing yok, haberler varsa üret
+  const newsCache = cache.get(loc);
+  if (newsCache?.news) {
+    try {
+      const result = await generateBriefing(newsCache.news, loc);
+      return res.json(result || { text: null });
+    } catch (err) {
+      return res.status(503).json({ error: err.message });
+    }
+  }
+  res.json({ text: null });
 });
 
 app.get('/api/search', async function(req, res) {
