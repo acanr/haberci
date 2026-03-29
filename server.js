@@ -468,6 +468,70 @@ app.get('/api/briefing', async function(req, res) {
   res.json({ text: null });
 });
 
+// ── Neden Önemli: Haber analiz endpoint'i ──────────────────────
+const explainCache = new Map();
+
+app.post('/api/explain', async function(req, res) {
+  const { headline, summary } = req.body;
+  if (!headline) {
+    return res.status(400).json({ error: 'headline gerekli' });
+  }
+
+  // Cache kontrolü — aynı başlık için tekrar API çağrısı yapma
+  const cacheKey = headline.slice(0, 80).toLowerCase().trim();
+  const cached = explainCache.get(cacheKey);
+  if (cached && (Date.now() - cached.generatedAt) < 60 * 60 * 1000) {
+    return res.json(cached);
+  }
+
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: `Aşağıdaki haber başlığını ve özetini oku. Sonra bu haberin neden önemli olduğunu sıradan bir Türk vatandaşına açıkla.
+
+Kurallar:
+- TAM OLARAK 2-3 cümle yaz
+- İlk cümle: bu haberin arka planı/bağlamı (kısaca)
+- İkinci cümle: bunun sıradan bir insanın hayatına etkisi veya neden umursaması gerektiği
+- Sade, anlaşılır Türkçe kullan — akademik değil, sohbet gibi
+- "Bu haber önemli çünkü" gibi klişelerle başlama, doğrudan konuya gir
+
+Başlık: ${headline}
+${summary ? 'Özet: ' + summary.slice(0, 200) : ''}`
+      }],
+    });
+
+    const explainText = message.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim();
+
+    const result = {
+      text: explainText,
+      headline,
+      generatedAt: Date.now(),
+    };
+
+    explainCache.set(cacheKey, result);
+
+    // Cache'i temiz tut — max 200 giriş
+    if (explainCache.size > 200) {
+      const oldest = [...explainCache.entries()]
+        .sort((a, b) => a[1].generatedAt - b[1].generatedAt)[0];
+      if (oldest) explainCache.delete(oldest[0]);
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error('[EXPLAIN ERROR]', err.message);
+    res.status(503).json({ error: 'Analiz üretilemedi: ' + err.message });
+  }
+});
+
 app.get('/api/search', async function(req, res) {
   const q = (req.query.q || '').toLowerCase().trim();
   if (!q || q.length < 2) {
