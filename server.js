@@ -666,8 +666,10 @@ app.get('/api/cron/tweet', async function(req, res) {
 
     res.json({ success: true, tweeted: 1, tweetId: result.data.id });
   } catch (err) {
-    console.error('[TWEET CRON ERROR]', err.message);
-    res.status(500).json({ success: false, error: err.message });
+    const detail = err.data?.detail || err.data?.errors?.[0]?.message || err.message;
+    const code = err.code || err.data?.status || 'unknown';
+    console.error('[TWEET CRON ERROR]', code, detail, JSON.stringify(err.data || {}));
+    res.status(500).json({ success: false, error: detail, code });
   }
 });
 
