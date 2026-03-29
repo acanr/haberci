@@ -629,6 +629,65 @@ app.get('/gizlilik', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'gizlilik.html'));
 });
 
+// ── Otomatik Tweet: Günlük sabah brifingi ──────────────────────
+app.get('/api/cron/tweet', async function(req, res) {
+  // Vercel cron veya manuel tetikleme
+  try {
+    const { TwitterApi } = require('twitter-api-v2');
+    
+    const twitterClient = new TwitterApi({
+      appKey: process.env.TWITTER_API_KEY,
+      appSecret: process.env.TWITTER_API_SECRET,
+      accessToken: process.env.TWITTER_ACCESS_TOKEN,
+      accessSecret: process.env.TWITTER_ACCESS_SECRET,
+    });
+
+    // Gündem haberlerini çek
+    const data = await fetchNews('Gundem');
+    if (!data.news || data.news.length === 0) {
+      return res.json({ success: false, error: 'Haber bulunamadı' });
+    }
+
+    // AI brifing üret
+    const briefing = await generateBriefing(data.news, 'Gundem');
+    const tweets = [];
+
+    // Tweet 1: Gündem özeti
+    if (briefing?.text) {
+      const briefingTweet = `📰 Gündemin Özeti\n\n${briefing.text.slice(0, 220)}\n\n🔗 haberimvar.app`;
+      try {
+        const result = await twitterClient.v2.tweet(briefingTweet);
+        tweets.push({ type: 'briefing', id: result.data.id });
+        console.log('[TWEET] Brifing paylaşıldı:', result.data.id);
+      } catch (err) {
+        console.error('[TWEET ERROR] Brifing:', err.message);
+      }
+    }
+
+    // Tweet 2-4: Top 3 haber (her biri ayrı tweet)
+    const topNews = data.news.slice(0, 3);
+    for (const item of topNews) {
+      const sourcesText = item.sourceCount > 1 ? `${item.sourceCount} kaynak` : (item.sources?.[0] || '');
+      const tweetText = `🔴 ${item.headline.slice(0, 200)}\n\n${sourcesText}\n\n💡 AI analizi → haberimvar.app\n\n#gündem #haberler`;
+      
+      try {
+        // Rate limit aşmamak için 2 saniye bekle
+        await new Promise(r => setTimeout(r, 2000));
+        const result = await twitterClient.v2.tweet(tweetText);
+        tweets.push({ type: 'news', id: result.data.id, headline: item.headline.slice(0, 50) });
+        console.log('[TWEET] Haber paylaşıldı:', item.headline.slice(0, 40));
+      } catch (err) {
+        console.error('[TWEET ERROR] Haber:', err.message);
+      }
+    }
+
+    res.json({ success: true, tweeted: tweets.length, tweets });
+  } catch (err) {
+    console.error('[TWEET CRON ERROR]', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
