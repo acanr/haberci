@@ -374,7 +374,7 @@ async function generateBriefing(newsItems, location) {
         role: 'user',
         content: `Bugün ${today}. Aşağıda ${locationNames[location] || 'Gündem'} kategorisindeki en önemli haberler var.
 
-Bu haberlerden yola çıkarak "Günün Brifingi" yaz. Kurallar:
+Bu haberlerden yola çıkarak "Gündemin Özeti" yaz. Kurallar:
 - TAM OLARAK 2-3 cümle yaz, fazla değil
 - Doğal, akıcı Türkçe kullan — haber bülteni gibi değil, zeki bir arkadaşın sabah özetlemesi gibi
 - En önemli 2-3 gelişmeyi birbirine bağlayarak anlat
@@ -417,8 +417,8 @@ app.get('/api/news', async function(req, res) {
   }
   const cached = cache.get(loc);
   if (cached && (Date.now() - cached.updatedAt) < 15 * 60 * 1000) {
-    // Cache geçerli — brifing varsa ekle
-    const briefing = briefingCache.get(`briefing_${loc}`);
+    // Cache geçerli — brifing sadece Gündem için
+    const briefing = loc === 'Gundem' ? briefingCache.get(`briefing_${loc}`) : null;
     return res.json({
       ...cached,
       briefing: briefing || null,
@@ -430,13 +430,14 @@ app.get('/api/news', async function(req, res) {
     const data = await fetchNews(loc);
     cache.set(loc, data);
     
-    // Brifing üretimini arka planda başlat (response'u bekletme)
-    generateBriefing(data.news, loc).catch(err => 
-      console.error('[BRIEFING BG]', err.message)
-    );
+    // Brifing sadece Gündem kategorisinde üretilsin
+    if (loc === 'Gundem') {
+      generateBriefing(data.news, loc).catch(err => 
+        console.error('[BRIEFING BG]', err.message)
+      );
+    }
     
-    // Mevcut brifing cache'i varsa ekle (bir önceki döngüden)
-    const briefing = briefingCache.get(`briefing_${loc}`);
+    const briefing = loc === 'Gundem' ? briefingCache.get(`briefing_${loc}`) : null;
     res.json({ ...data, briefing: briefing || null });
   } catch (err) {
     console.error('[ERROR]', err.message);
@@ -445,17 +446,16 @@ app.get('/api/news', async function(req, res) {
   }
 });
 
-// Brifing endpoint — frontend polling için
+// Brifing endpoint — sadece Gündem için
 app.get('/api/briefing', async function(req, res) {
   const loc = req.query.loc || 'Gundem';
-  if (!LOCATIONS.includes(loc)) {
-    return res.status(400).json({ error: 'Geçersiz lokasyon' });
+  if (loc !== 'Gundem') {
+    return res.json({ text: null });
   }
   const briefing = briefingCache.get(`briefing_${loc}`);
   if (briefing) {
     return res.json(briefing);
   }
-  // Cache'de brifing yok, haberler varsa üret
   const newsCache = cache.get(loc);
   if (newsCache?.news) {
     try {
