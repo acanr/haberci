@@ -280,6 +280,1086 @@
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
     }
+
+    /* ── Haber Detay Modal ────────────────────────── */
+    .news-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .news-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .news-modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      max-width: 680px;
+      width: 100%;
+      transform: translateY(12px);
+      transition: transform 0.25s;
+      overflow: hidden;
+    }
+    .news-modal-backdrop.open .news-modal {
+      transform: translateY(0);
+    }
+    .news-modal-header {
+      padding: 24px 28px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .news-modal-close {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--ink-3);
+      flex-shrink: 0;
+      transition: all 0.15s;
+      margin-left: auto;
+    }
+    .news-modal-close:hover { background: var(--surface-2); color: var(--ink); }
+    .news-modal-body { padding: 20px 28px 28px; }
+    .news-modal-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .news-modal-headline {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+    .news-modal-summary {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--ink-2);
+      margin-bottom: 20px;
+      font-weight: 300;
+    }
+    .news-modal-ai-section {
+      background: linear-gradient(135deg, #fefcf7 0%, #fef9f0 100%);
+      border: 1px solid #f0e0b8;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+    .news-modal-ai-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #b8860b;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .news-modal-ai-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .news-modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .news-modal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .news-modal-btn-primary {
+      background: var(--ink);
+      color: white;
+      border: 1px solid var(--ink);
+    }
+    .news-modal-btn-primary:hover { background: #333; }
+    .news-modal-btn-secondary {
+      background: var(--surface);
+      color: var(--ink-2);
+      border: 1px solid var(--border-strong);
+    }
+    .news-modal-btn-secondary:hover { background: var(--surface-2); }
+    .news-modal-sources {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .news-modal-sources-label {
+      font-size: 12px;
+      color: var(--ink-3);
+    }
+    @media(max-width: 600px) {
+      .news-modal-backdrop { padding: 0; align-items: flex-end; }
+      .news-modal { border-radius: 16px 16px 0 0; max-height: 92vh; overflow-y: auto; }
+      .news-modal-headline { font-size: 22px; }
+      .news-modal-header { padding: 20px 20px 0; }
+      .news-modal-body { padding: 16px 20px 24px; }
+    }
+    .sidebar { position: sticky; top: 80px; }
+    .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+    .sidebar-item { display: flex; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; text-decoration: none; }
+    .sidebar-item:last-child { border-bottom: none; }
+    .sidebar-item:hover { background: var(--surface-2); }
+    .sidebar-body { flex: 1; min-width: 0; }
+    .sidebar-source-row { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .sidebar-source-logo { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; }
+    .sidebar-source-name { font-size: 11px; font-weight: 500; color: var(--ink-2); }
+    .sidebar-headline { font-size: 13px; color: var(--ink); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .sidebar-time { font-size: 11px; color: var(--ink-4); margin-top: 3px; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .modal { background: white; border-radius: var(--radius); padding: 32px; max-width: 380px; width: 100%; transform: translateY(8px); transition: transform 0.2s; }
+    .modal-backdrop.open .modal { transform: translateY(0); }
+    .modal-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 8px; }
+    .modal-sub { font-size: 14px; color: var(--ink-2); margin-bottom: 24px; line-height: 1.6; }
+    .modal-input { width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); font-family: var(--font-body); font-size: 14px; margin-bottom: 12px; outline: none; }
+    .modal-btn { width: 100%; padding: 11px; border-radius: var(--radius-sm); background: var(--ink); color: white; font-size: 14px; font-weight: 500; border: none; cursor: pointer; font-family: var(--font-body); margin-bottom: 10px; }
+    .modal-close { width: 100%; padding: 8px; background: none; color: var(--ink-3); font-size: 13px; border: none; cursor: pointer; font-family: var(--font-body); }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: white; padding: 10px 20px; border-radius: 100px; font-size: 13px; z-index: 300; transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .fade-in { animation: fadeIn 0.4s ease both; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
+    @media(max-width: 900px) { .content-layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
+    @media(max-width: 600px) { .hero { padding: 28px 16px 20px; } .controls-bar, .status-bar, .search-bar-inline { padding: 12px 16px; } .content-layout { padding: 20px 16px 60px; } .news-card { padding: 18px 14px; gap: 14px; } .nav-date { display: none; } .nav-ticker { display: none; } .briefing-card { padding: 20px 18px; margin-bottom: 18px; } .briefing-text { font-size: 14.5px; line-height: 1.7; } }
+  </style>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1BSW710W"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GG1BSW710W');
+  </script>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">haberim<span>var</span></a>
+  <div class="nav-ticker">
+    <span class="ticker-item"><span class="ticker-label">USD</span> <span class="ticker-val" id="t-usd">—</span></span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item"><span class="ticker-label">EUR</span> <span class="ticker-val" id="t-eur">—</span></span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-date" id="nav-date"></span>
+    <button class="nav-btn" onclick="openModal()">🔔<span class="notif-dot"></span></button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Yapay Zeka Destekli · Her 15 Dakika Güncellenir</div>
+  <h1 class="hero-title">Gündemin en önemli<br><em>10 haberi.</em></h1>
+  <p class="hero-sub">Türkiye ve dünyadan haberler toplanır, önem sırasına göre sıralanır. Yapay zeka gündemi özetler.</p>
+</div>
+
+<div class="status-bar">
+  <div class="status-dot" id="status-dot"></div>
+  <div class="status-text" id="status-text">Bağlanıyor...</div>
+  <div class="next-update" id="next-update"></div>
+</div>
+
+<div class="controls-bar">
+  <div class="loc-pills" id="pills">
+    <button class="pill active" data-loc="Gündem">📰 Gündem</button>
+    <button class="pill" data-loc="Dünya">🌍 Dünya</button>
+    <button class="pill" data-loc="Ekonomi">📊 Ekonomi</button>
+    <button class="pill" data-loc="Teknoloji">💻 Teknoloji</button>
+    <button class="pill" data-loc="Spor">⚽ Spor</button>
+    <button class="pill" data-loc="Kültür Sanat">🎭 Kültür Sanat</button>
+  </div>
+</div>
+
+<div class="search-bar-inline">
+  <div class="search-bar-inner">
+    <span class="search-bar-icon">🔍</span>
+    <input class="search-bar-input" id="search-bar-input" type="text" placeholder="Haber ara... (deprem, faiz, Erdoğan...)" autocomplete="off" />
+    <button class="search-bar-clear" id="search-bar-clear" onclick="clearInlineSearch()" style="display:none">✕</button>
+  </div>
+</div>
+
+<div class="content-layout">
+  <div style="display:flex;flex-direction:column;min-width:0;">
+    <!-- Günün Brifingi -->
+    <div class="briefing-card" id="briefing-card" style="display:none;">
+      <div class="briefing-header">
+        <div class="briefing-icon">⚡</div>
+        <span class="briefing-label">Gündemin Özeti</span>
+        <span class="briefing-sublabel" id="briefing-time"></span>
+      </div>
+      <div id="briefing-content">
+        <div class="briefing-skeleton">
+          <div class="briefing-skeleton-line"></div>
+          <div class="briefing-skeleton-line"></div>
+          <div class="briefing-skeleton-line"></div>
+        </div>
+      </div>
+    </div>
+    
+    <main id="main-content">
+      <div class="loading-wrap"><div class="loader"></div><div class="loading-label">Haberler yükleniyor...</div></div>
+    </main>
+  </div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">📰 Kaynaklarda Öne Çıkanlar</div>
+      <div id="sidebar-list">
+        <div style="padding:20px 16px;font-size:13px;color:var(--ink-4)">Yükleniyor...</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="modal-backdrop" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Günlük bildirim al</div>
+    <div class="modal-sub">Her sabah 08:00'de seçtiğin kategorinin en önemli haberleri e-postana gelsin.</div>
+    <input class="modal-input" type="email" placeholder="E-posta adresin" id="email-input" />
+    <button class="modal-btn" onclick="subscribe()">Abone ol</button>
+    <button class="modal-close" onclick="closeModal()">Vazgeç</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Haber Detay Modal -->
+<div class="news-modal-backdrop" id="news-modal" onclick="closeNewsModal(event)">
+  <div class="news-modal">
+    <div class="news-modal-header">
+      <div style="flex:1"></div>
+      <button class="news-modal-close" onclick="closeNewsModal()">✕</button>
+    </div>
+    <div class="news-modal-body" id="news-modal-body"></div>
+  </div>
+</div>
+
+<footer style="border-top:1px solid rgba(0,0,0,0.08);padding:20px 24px;text-align:center;font-size:12px;color:#888;font-family:'DM Sans',system-ui,sans-serif;margin-top:20px;">
+  <a href="/hakkimizda" style="color:#888;text-decoration:none;margin:0 10px;">Hakkımızda</a>
+  <a href="/iletisim" style="color:#888;text-decoration:none;margin:0 10px;">İletişim</a>
+  <a href="/gizlilik" style="color:#888;text-decoration:none;margin:0 10px;">Gizlilik Politikası</a>
+  <span style="margin:0 10px;">© 2026 haberimvar.app</span>
+</footer>
+
+<script>
+  let currentLoc = 'Gündem';
+  let nextUpdateSec = 900;
+  let countdownInterval = null;
+  let searchTimeout = null;
+
+  const SOURCE_DOMAINS = {
+    'NTV': 'ntv.com.tr', 'NTV Dünya': 'ntv.com.tr', 'NTV Gündem': 'ntv.com.tr', 'NTV Teknoloji': 'ntv.com.tr',
+    'Hürriyet': 'hurriyet.com.tr', 'Hürriyet Dünya': 'hurriyet.com.tr', 'Hürriyet Spor': 'hurriyet.com.tr', 'Hürriyet Ekonomi': 'hurriyet.com.tr',
+    'DW Türkçe': 'dw.com', 'TRT Haber': 'trthaber.com', 'TRT Spor': 'trthaber.com', 'TRT K&S': 'trthaber.com',
+    'Sabah': 'sabah.com.tr', 'Sabah SD': 'sabah.com.tr', 'Sabah Spor': 'sabah.com.tr', 'Sabah K&S': 'sabah.com.tr',
+    'Milliyet': 'milliyet.com.tr', 'Cumhuriyet': 'cumhuriyet.com.tr', 'Cumhuriyet Spor': 'cumhuriyet.com.tr', 'Cumhuriyet K&S': 'cumhuriyet.com.tr',
+    'Haberturk': 'haberturk.com', 'Haberturk Spor': 'haberturk.com', 'Haberturk K&S': 'haberturk.com',
+    'Bloomberg HT': 'bloomberght.com',
+    'Sözcü Spor': 'sozcu.com.tr', 'Sözcü K&S': 'sozcu.com.tr',
+    'A Spor': 'aspor.com.tr',
+    'Webtekno': 'webtekno.com', 'ShiftDelete': 'shiftdelete.net',
+  };
+
+  function faviconUrl(s) {
+    const d = SOURCE_DOMAINS[s];
+    return d ? `https://www.google.com/s2/favicons?domain=${d}&sz=32` : null;
+  }
+
+  function timeAgo(pubDate) {
+    if (!pubDate) return null;
+    let date;
+    try {
+      const cleaned = pubDate.trim().replace(/\s+Z$/i, 'Z').replace(/\s{2,}/g, ' ');
+      date = new Date(cleaned);
+      if (isNaN(date.getTime())) {
+        const m = cleaned.match(/(\d{1,2})\s+(\w{3})\s+(\d{4})\s+(\d{2}):(\d{2}):(\d{2})\s*(Z|[+-]\d{4})?/);
+        if (m) {
+          const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+          const tz = m[7] || 'Z';
+          const offsetMin = tz === 'Z' ? 0 : (parseInt(tz.slice(0,3))*60 + parseInt(tz.slice(0,1)+tz.slice(3)));
+          date = new Date(Date.UTC(+m[3], months[m[2]], +m[1], +m[4], +m[5]-offsetMin, +m[6]));
+        }
+      }
+    } catch(e) { return null; }
+    if (!date || isNaN(date.getTime())) return null;
+    const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+    if (mins < 1) return 'Az önce';
+    if (mins < 60) return `${mins} dk önce`;
+    const h = Math.floor(mins / 60);
+    if (h < 24) return `${h} saat önce`;
+    return `${Math.floor(h / 24)} gün önce`;
+  }
+
+  function highlight(text, q) {
+    if (!q || !text) return text;
+    const esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return text.replace(new RegExp(`(${esc})`, 'gi'), '<mark class="search-highlight">$1</mark>');
+  }
+
+  document.getElementById('nav-date').textContent = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  document.getElementById('pills').addEventListener('click', e => {
+    const pill = e.target.closest('.pill');
+    if (!pill) return;
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentLoc = pill.dataset.loc;
+    clearInlineSearch();
+    loadNews();
+  });
+
+  document.getElementById('search-bar-input').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    const q = this.value.trim();
+    document.getElementById('search-bar-clear').style.display = q ? 'block' : 'none';
+    if (!q) { restoreNews(); return; }
+    if (q.length < 2) return;
+    document.getElementById('main-content').innerHTML = `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">Aranıyor...</div></div>`;
+    searchTimeout = setTimeout(() => doSearch(q), 300);
+  });
+
+  document.getElementById('search-bar-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') clearInlineSearch();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const newsModal = document.getElementById('news-modal');
+      if (newsModal.classList.contains('open')) closeNewsModal();
+    }
+  });
+
+  function clearInlineSearch() {
+    document.getElementById('search-bar-input').value = '';
+    document.getElementById('search-bar-clear').style.display = 'none';
+    restoreNews();
+  }
+
+  function restoreNews() {
+    if (window._lastNewsHtml) {
+      document.getElementById('main-content').innerHTML = window._lastNewsHtml;
+      window._newsData = window._lastNewsData;
+    }
+  }
+
+  async function doSearch(q) {
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      renderSearchResults(data, q);
+    } catch(e) {
+      document.getElementById('main-content').innerHTML = '<div class="error-wrap">Arama sırasında hata oluştu.</div>';
+    }
+  }
+
+  function renderSearchResults(data, q) {
+    const main = document.getElementById('main-content');
+    if (!data.results?.length) {
+      main.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--ink-3);font-size:15px;">"${q}" için sonuç bulunamadı</div>`;
+      return;
+    }
+    let html = `<div class="search-result-meta">"${q}" için <strong style="color:var(--ink)">${data.count}</strong> sonuç</div>`;
+    html += '<div class="news-grid">';
+    data.results.forEach(item => {
+      const ago = timeAgo(item.pubDate);
+      const src = (item.sources?.[0]) || '';
+      const fav = faviconUrl(src);
+      const img = fav ? `<img src="${fav}" alt="" onerror="this.style.display='none'" style="width:14px;height:14px;border-radius:50%;object-fit:cover;">` : '';
+      html += `<a href="${item.link || '#'}" target="_blank" rel="noopener" style="display:flex;flex-direction:column;gap:6px;padding:20px 26px;background:var(--surface);text-decoration:none;transition:background 0.15s;border:none;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='var(--surface)'">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span class="cat-badge">${item.category}</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--ink-3);">${img}${src}</span>
+          ${ago ? `<span style="font-size:11px;color:var(--ink-4);margin-left:auto;">${ago}</span>` : ''}
+        </div>
+        <div style="font-family:var(--font-display);font-size:20px;font-weight:600;line-height:1.35;color:var(--ink);">${highlight(item.headline, q)}</div>
+        ${item.summary ? `<div style="font-size:13px;color:var(--ink-2);line-height:1.65;font-weight:300;">${highlight(item.summary.slice(0,150), q)}...</div>` : ''}
+      </a>`;
+    });
+    html += '</div>';
+    main.innerHTML = html;
+  }
+
+  async function loadNews() {
+    setStatus('updating', 'Güncelleniyor...');
+    document.getElementById('main-content').innerHTML = `<div class="loading-wrap"><div class="loader"></div><div class="loading-label">${currentLoc} haberleri yükleniyor...</div></div>`;
+    try {
+      const locMap = {
+        'Gündem': 'Gundem', 'Dünya': 'Dunya', 'Ekonomi': 'Ekonomi',
+        'Spor': 'Spor', 'Teknoloji': 'Teknoloji', 'Kültür Sanat': 'KulturSanat'
+      };
+      const apiLoc = locMap[currentLoc] || currentLoc;
+      const res = await fetch(`/api/news?loc=${apiLoc}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      renderNews(data);
+      renderSidebar(data.news);
+      startCountdown(data.nextUpdateIn || 900);
+      setStatus('live', `Son güncelleme: az önce · ${data.articleCount} haber tarandı`);
+      
+      // Brifing render — sadece Gündem'de
+      if (apiLoc === 'Gundem') {
+        if (data.briefing?.text) {
+          renderBriefing(data.briefing);
+        } else {
+          showBriefingSkeleton();
+          pollBriefing(apiLoc);
+        }
+      } else {
+        document.getElementById('briefing-card').style.display = 'none';
+      }
+    } catch (err) {
+      document.getElementById('main-content').innerHTML = `<div class="error-wrap">Haberler yüklenemedi: ${err.message}</div>`;
+      setStatus('', 'Bağlantı hatası');
+    }
+  }
+
+  function renderBriefing(briefing) {
+    const card = document.getElementById('briefing-card');
+    const content = document.getElementById('briefing-content');
+    const timeEl = document.getElementById('briefing-time');
+    
+    card.style.display = 'block';
+    window._briefingText = briefing.text;
+    content.innerHTML = `
+      <div class="briefing-text">${briefing.text}</div>
+      <div class="briefing-footer">
+        <span class="briefing-ai-badge">✨ AI tarafından ${briefing.newsCount || 10} haberden üretildi</span>
+        <button class="briefing-share-btn" onclick="shareBriefing(this)">📤 Paylaş</button>
+      </div>
+    `;
+    
+    if (briefing.generatedAt) {
+      const ago = Math.round((Date.now() - briefing.generatedAt) / 60000);
+      timeEl.textContent = ago < 1 ? 'Az önce güncellendi' : `${ago} dk önce`;
+    }
+  }
+
+  async function shareBriefing(btn) {
+    const text = window._briefingText;
+    if (!text) return;
+    
+    const shareText = `📰 Gündemin Özeti\n\n${text}\n\n— haberimvar.app`;
+    const shareUrl = 'https://www.haberimvar.app';
+    
+    // Web Share API varsa (mobilde WhatsApp, Telegram vs. direkt açılır)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Gündemin Özeti — Haberimvar',
+          text: shareText,
+          url: shareUrl
+        });
+        btn.innerHTML = '✓ Paylaşıldı';
+        btn.classList.add('shared');
+        setTimeout(() => { btn.innerHTML = '📤 Paylaş'; btn.classList.remove('shared'); }, 3000);
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return; // Kullanıcı iptal etti
+      }
+    }
+    
+    // Desktop fallback — panoya kopyala
+    try {
+      await navigator.clipboard.writeText(shareText);
+      btn.innerHTML = '✓ Kopyalandı';
+      btn.classList.add('shared');
+      showToast('📋 Gündem özeti panoya kopyalandı!');
+      setTimeout(() => { btn.innerHTML = '📤 Paylaş'; btn.classList.remove('shared'); }, 3000);
+    } catch (e) {
+      // Son çare — eski yöntem
+      const ta = document.createElement('textarea');
+      ta.value = shareText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.innerHTML = '✓ Kopyalandı';
+      btn.classList.add('shared');
+      showToast('📋 Gündem özeti panoya kopyalandı!');
+      setTimeout(() => { btn.innerHTML = '📤 Paylaş'; btn.classList.remove('shared'); }, 3000);
+    }
+  }
+
+  function showBriefingSkeleton() {
+    const card = document.getElementById('briefing-card');
+    const content = document.getElementById('briefing-content');
+    card.style.display = 'block';
+    content.innerHTML = `
+      <div class="briefing-skeleton">
+        <div class="briefing-skeleton-line"></div>
+        <div class="briefing-skeleton-line"></div>
+        <div class="briefing-skeleton-line"></div>
+      </div>
+    `;
+  }
+
+  let briefingPollTimer = null;
+  function pollBriefing(loc, attempts) {
+    attempts = attempts || 0;
+    if (attempts > 8) return; // Max 8 deneme (40 saniye)
+    clearTimeout(briefingPollTimer);
+    briefingPollTimer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/briefing?loc=${loc}`);
+        const data = await res.json();
+        if (data?.text) {
+          renderBriefing(data);
+        } else {
+          pollBriefing(loc, attempts + 1);
+        }
+      } catch(e) {
+        pollBriefing(loc, attempts + 1);
+      }
+    }, 5000); // 5 saniyede bir kontrol
+  }
+
+  function renderNews(data) {
+    const main = document.getElementById('main-content');
+    if (!data.news?.length) { main.innerHTML = '<div class="error-wrap">Haber bulunamadı.</div>'; return; }
+    const rankStr = n => n.rank < 10 ? '0' + n.rank : '' + n.rank;
+    let html = '<div class="news-grid">';
+    data.news.forEach((item, i) => {
+      const ago = timeAgo(item.pubDate);
+      const sourcesToShow = (item.sources || []).slice(0, 2);
+      const extraCount = (item.sources || []).length - 2;
+      const sourceChips = sourcesToShow.map(s => {
+        const fav = faviconUrl(s);
+        const img = fav ? `<img src="${fav}" alt="" onerror="this.style.display='none'">` : '';
+        return `<span class="source-chip">${img}${s}</span>`;
+      }).join('');
+      const extraChip = extraCount > 0 ? `<span class="source-chip-more">+${extraCount}</span>` : '';
+      const timeChip = ago ? `<span class="time-badge">${ago}</span>` : '';
+      html += `<div class="news-card fade-in" style="animation-delay:${i*40}ms" onclick="openNews(${i})">
+        <div class="rank-num">${rankStr(item)}</div>
+        <div class="news-body">
+          <div class="news-meta">
+            <span class="cat-badge">${item.category}</span>
+            ${item.isBreaking ? '<span class="breaking-badge">● Son Dakika</span>' : ''}
+            ${item.sourceCount > 1 ? `<span class="src-badge">${item.sourceCount} kaynak</span>` : ''}
+          </div>
+          <div class="news-headline">${item.headline}</div>
+          <div class="news-summary">${item.summary}</div>
+          <div class="news-footer">
+            ${sourceChips}${extraChip}
+            ${currentLoc === 'Gündem' ? `<button class="explain-btn" onclick="event.stopPropagation(); explainNews(${i}, this)" title="Bu haber neden önemli?">💡 Neden Önemli?</button>` : ''}
+            ${timeChip}
+          </div>
+          ${currentLoc === 'Gündem' ? `<div class="explain-panel" id="explain-${i}" style="display:none;"></div>` : ''}
+        </div>
+        <div class="news-arrow">→</div>
+      </div>`;
+    });
+    html += '</div>';
+    main.innerHTML = html;
+    window._newsData = data.news;
+    window._lastNewsData = data.news;
+    window._lastNewsHtml = html;
+  }
+
+  function renderSidebar(newsItems) {
+    if (!newsItems?.length) return;
+    const bySource = {};
+    newsItems.forEach(item => {
+      (item.sources || []).forEach(src => {
+        if (!bySource[src] || (item.score || 0) > (bySource[src].score || 0)) {
+          bySource[src] = { ...item, _displaySource: src };
+        }
+      });
+    });
+    const picks = Object.values(bySource).sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 6);
+    let html = '';
+    picks.forEach(item => {
+      const ago = timeAgo(item.pubDate);
+      const src = item._displaySource;
+      const fav = faviconUrl(src);
+      const imgTag = fav ? `<img class="sidebar-source-logo" src="${fav}" alt="" onerror="this.style.display='none'">` : '';
+      html += `<a class="sidebar-item" href="${item.link || '#'}" target="_blank" rel="noopener">
+        <div class="sidebar-body">
+          <div class="sidebar-source-row">${imgTag}<span class="sidebar-source-name">${src}</span></div>
+          <div class="sidebar-headline">${item.headline}</div>
+          ${ago ? `<div class="sidebar-time">${ago}</div>` : ''}
+        </div>
+      </a>`;
+    });
+    document.getElementById('sidebar-list').innerHTML = html;
+  }
+
+  function openNews(idx) {
+    const item = window._newsData?.[idx];
+    if (!item) return;
+
+    const modal = document.getElementById('news-modal');
+    const body = document.getElementById('news-modal-body');
+    const ago = timeAgo(item.pubDate);
+
+    // Kaynak chip'leri
+    const sourceChips = (item.sources || []).map(s => {
+      const fav = faviconUrl(s);
+      const img = fav ? `<img src="${fav}" alt="" onerror="this.style.display='none'">` : '';
+      return `<span class="source-chip">${img}${s}</span>`;
+    }).join('');
+
+    body.innerHTML = `
+      <div class="news-modal-meta">
+        <span class="cat-badge">${item.category}</span>
+        ${item.isBreaking ? '<span class="breaking-badge">● Son Dakika</span>' : ''}
+        ${ago ? `<span style="font-size:12px;color:var(--ink-4);margin-left:auto;">${ago}</span>` : ''}
+      </div>
+      <div class="news-modal-headline">${item.headline}</div>
+      <div class="news-modal-summary">${item.summary}</div>
+      <div class="news-modal-sources">
+        <span class="news-modal-sources-label">Kaynaklar:</span>
+        ${sourceChips}
+      </div>
+      ${currentLoc === 'Gündem' ? `
+      <div class="news-modal-ai-section" id="modal-ai-section">
+        <div class="news-modal-ai-label">💡 Neden Önemli?</div>
+        <div class="news-modal-ai-text" id="modal-ai-text">
+          <div style="display:flex;align-items:center;gap:8px;color:var(--ink-3);font-size:13px;">
+            <div class="explain-spinner"></div> Yapay zeka analiz ediyor...
+          </div>
+        </div>
+      </div>` : ''}
+      <div class="news-modal-actions">
+        <a class="news-modal-btn news-modal-btn-primary" href="${item.link || '#'}" target="_blank" rel="noopener">
+          Haberin tamamını oku →
+        </a>
+        <button class="news-modal-btn news-modal-btn-secondary" onclick="shareNews(${idx})">
+          📤 Paylaş
+        </button>
+      </div>
+    `;
+
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Gündem'de otomatik AI analiz yükle
+    if (currentLoc === 'Gündem') {
+      loadModalExplain(item);
+    }
+  }
+
+  async function loadModalExplain(item) {
+    try {
+      const res = await fetch('/api/explain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ headline: item.headline, summary: item.summary || '' })
+      });
+      const data = await res.json();
+      const el = document.getElementById('modal-ai-text');
+      if (el && data.text) {
+        el.innerHTML = data.text;
+      } else if (el) {
+        el.innerHTML = '<span style="color:var(--ink-3)">Analiz yüklenemedi.</span>';
+      }
+    } catch (e) {
+      const el = document.getElementById('modal-ai-text');
+      if (el) el.innerHTML = '<span style="color:var(--ink-3)">Bağlantı hatası.</span>';
+    }
+  }
+
+  function closeNewsModal(e) {
+    if (e && e.target !== document.getElementById('news-modal')) return;
+    document.getElementById('news-modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  async function shareNews(idx) {
+    const item = window._newsData?.[idx];
+    if (!item) return;
+    const text = `${item.headline}\n\n${item.summary?.slice(0, 150) || ''}\n\nDetay: haberimvar.app`;
+    if (navigator.share) {
+      try { await navigator.share({ title: item.headline, text, url: 'https://www.haberimvar.app' }); } catch(e) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('📋 Haber panoya kopyalandı!');
+      } catch(e) {}
+    }
+  }
+
+  async function explainNews(idx, btn) {
+    const item = window._newsData?.[idx];
+    if (!item) return;
+
+    const panel = document.getElementById('explain-' + idx);
+    
+    // Toggle — zaten açıksa kapat
+    if (panel.style.display === 'block' && panel.dataset.loaded === 'true') {
+      panel.style.display = 'none';
+      btn.innerHTML = '💡 Neden Önemli?';
+      return;
+    }
+
+    // Loading state
+    btn.classList.add('loading');
+    btn.innerHTML = '<div class="explain-spinner"></div> Analiz ediliyor...';
+    panel.style.display = 'block';
+    panel.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--ink-3);font-size:13px;"><div class="explain-spinner"></div> Yapay zeka haberi analiz ediyor...</div>';
+
+    try {
+      const res = await fetch('/api/explain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          headline: item.headline,
+          summary: item.summary || ''
+        })
+      });
+      const data = await res.json();
+
+      if (data.text) {
+        panel.innerHTML = `
+          <div class="explain-panel-text">${data.text}</div>
+          <div class="explain-panel-badge">✨ AI analizi</div>
+        `;
+        panel.dataset.loaded = 'true';
+        btn.innerHTML = '💡 Gizle';
+      } else {
+        panel.innerHTML = '<div style="font-size:13px;color:var(--ink-3);">Analiz üretilemedi, lütfen tekrar deneyin.</div>';
+        btn.innerHTML = '💡 Neden Önemli?';
+      }
+    } catch (err) {
+      panel.innerHTML = '<div style="font-size:13px;color:var(--accent);">Bağlantı hatası, lütfen tekrar deneyin.</div>';
+      btn.innerHTML = '💡 Neden Önemli?';
+    }
+
+    btn.classList.remove('loading');
+  }
+
+  function openModal() { document.getElementById('modal').classList.add('open'); }
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modal'))
+      document.getElementById('modal').classList.remove('open');
+  }
+  function subscribe() {
+    const email = document.getElementById('email-input').value;
+    if (!email.includes('@')) { showToast('Geçerli bir e-posta girin'); return; }
+    closeModal();
+    showToast('✓ Abone oldunuz! Yarın 08:00\'de ilk haberiniz gelecek.');
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function setStatus(type, text) {
+    document.getElementById('status-dot').className = 'status-dot' + (type ? ' ' + type : '');
+    document.getElementById('status-text').innerHTML = text;
+  }
+  function startCountdown(seconds) {
+    clearInterval(countdownInterval);
+    nextUpdateSec = seconds;
+    updateCountdown();
+    countdownInterval = setInterval(() => {
+      nextUpdateSec--;
+      if (nextUpdateSec <= 0) { loadNews(); return; }
+      updateCountdown();
+    }, 1000);
+  }
+  function updateCountdown() {
+    const m = Math.floor(nextUpdateSec / 60), s = nextUpdateSec % 60;
+    document.getElementById('next-update').textContent = `Sonraki: ${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  async function fetchRates() {
+    try {
+      const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      const data = await res.json();
+      const usdTry = data.rates?.TRY;
+      if (usdTry) document.getElementById('t-usd').textContent = usdTry.toFixed(2) + ' ₺';
+      if (data.rates?.EUR && usdTry) {
+        document.getElementById('t-eur').textContent = (usdTry / data.rates.EUR).toFixed(2) + ' ₺';
+      }
+    } catch(e) {}
+  }
+
+  fetchRates();
+  setInterval(fetchRates, 5 * 60 * 1000);
+  loadNews();
+  setInterval(loadNews, 15 * 60 * 1000);
+</script>
+</body>
+</html>  <!-- Theme Color (mobil tarayıcı üst bar rengi) -->
+  <meta name="theme-color" content="#0f0f0f" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f0f0f; --ink-2: #444; --ink-3: #888; --ink-4: #bbb;
+      --surface: #fff; --surface-2: #f7f6f4; --surface-3: #eeece9;
+      --accent: #c0392b; --accent-soft: #f9ebe9;
+      --green: #1a7a4a; --green-soft: #e8f5ee;
+      --border: rgba(0,0,0,0.08); --border-strong: rgba(0,0,0,0.15);
+      --radius: 14px; --radius-sm: 8px;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--surface); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 12px; }
+    .nav-brand { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; letter-spacing: -0.3px; flex-shrink: 0; }
+    .nav-brand span { color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-date { font-size: 13px; color: var(--ink-3); }
+    .nav-ticker { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 100px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap; }
+    .ticker-item { display: flex; align-items: center; gap: 4px; }
+    .ticker-label { color: var(--ink-3); font-weight: 400; }
+    .ticker-val { color: var(--ink); }
+    .ticker-sep { color: var(--border-strong); }
+    .nav-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: background 0.15s; position: relative; }
+    .nav-btn:hover { background: var(--surface-2); }
+    .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 1.5px solid white; }
+    .hero { padding: 48px 24px 28px; max-width: 1200px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+    .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .hero-title { font-family: var(--font-display); font-size: clamp(30px,5vw,50px); font-weight: 600; line-height: 1.1; letter-spacing: -1px; color: var(--ink); margin-bottom: 14px; }
+    .hero-title em { font-style: italic; color: var(--ink-2); }
+    .hero-sub { font-size: 15px; color: var(--ink-2); line-height: 1.6; max-width: 500px; font-weight: 300; }
+    .status-bar { max-width: 1200px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; transition: background 0.3s; }
+    .status-dot.live { background: var(--green); animation: pulse 2s ease infinite; }
+    .status-dot.updating { background: #f39c12; animation: pulse 0.6s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+    .status-text { font-size: 12px; color: var(--ink-3); }
+    .next-update { margin-left: auto; font-size: 12px; color: var(--ink-4); }
+    .controls-bar { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
+    .loc-pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+    .pill { padding: 7px 16px; border-radius: 100px; font-size: 13px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-2); cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: var(--font-body); }
+    .pill:hover { background: var(--surface-2); }
+    .pill.active { background: var(--ink); color: white; border-color: var(--ink); }
+    .search-bar-inline { max-width: 1200px; margin: 0 auto; padding: 12px 24px; border-bottom: 1px solid var(--border); }
+    .search-bar-inner { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 100px; padding: 8px 16px; transition: border-color 0.15s, background 0.15s; }
+    .search-bar-inner:focus-within { border-color: var(--ink); background: var(--surface); }
+    .search-bar-icon { font-size: 14px; color: var(--ink-3); flex-shrink: 0; }
+    .search-bar-input { flex: 1; border: none; background: none; font-family: var(--font-body); font-size: 14px; color: var(--ink); outline: none; }
+    .search-bar-input::placeholder { color: var(--ink-4); }
+    .search-bar-clear { border: none; background: none; color: var(--ink-3); cursor: pointer; font-size: 14px; padding: 0; line-height: 1; flex-shrink: 0; }
+    .search-result-meta { font-size: 13px; color: var(--ink-3); margin-bottom: 16px; }
+    .content-layout { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 300px; gap: 32px; padding: 28px 24px 80px; align-items: start; }
+    .loading-wrap { display: flex; flex-direction: column; align-items: center; padding: 80px 0; gap: 16px; }
+    .loader { width: 34px; height: 34px; border: 2px solid var(--border-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loading-label { font-size: 14px; color: var(--ink-3); }
+    .news-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .news-card { background: var(--surface); padding: 22px 26px; display: flex; gap: 20px; align-items: flex-start; transition: background 0.15s; cursor: pointer; border: none; text-align: left; width: 100%; font-family: var(--font-body); }
+    .news-card:hover { background: var(--surface-2); }
+    .rank-num { font-family: var(--font-display); font-size: 26px; font-weight: 400; color: var(--ink-4); line-height: 1; flex-shrink: 0; padding-top: 2px; min-width: 36px; }
+    .news-body { flex: 1; min-width: 0; }
+    .news-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .cat-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 4px; }
+    .breaking-badge { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green); background: var(--green-soft); padding: 3px 8px; border-radius: 4px; }
+    .src-badge { font-size: 11px; color: var(--ink-3); }
+    .news-headline { font-family: var(--font-display); font-size: 23px; font-weight: 600; line-height: 1.35; color: var(--ink); margin-bottom: 8px; }
+    .news-summary { font-size: 13px; color: var(--ink-2); line-height: 1.65; font-weight: 300; }
+    .news-footer { display: flex; align-items: center; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .source-chip { display: flex; align-items: center; gap: 5px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 100px; padding: 3px 8px 3px 4px; font-size: 11px; color: var(--ink-2); }
+    .source-chip img { width: 14px; height: 14px; border-radius: 50%; object-fit: cover; }
+    .source-chip-more { font-size: 11px; color: var(--ink-4); padding: 3px 4px; }
+    .time-badge { margin-left: auto; font-size: 11px; color: var(--ink-4); white-space: nowrap; }
+    .news-arrow { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ink-3); align-self: center; transition: all 0.15s; }
+    .news-card:hover .news-arrow { background: var(--ink); color: white; border-color: var(--ink); }
+    .error-wrap { background: #fff5f5; border: 1px solid #fcc; border-radius: var(--radius); padding: 24px; text-align: center; color: #c0392b; font-size: 14px; }
+    .search-highlight { background: #fff3cd; border-radius: 2px; padding: 0 2px; }
+    
+    /* ── Günün Brifingi ───────────────────────────── */
+    .briefing-card {
+      background: linear-gradient(135deg, #fafaf8 0%, #f5f3ef 100%);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 28px 30px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .briefing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: linear-gradient(180deg, var(--accent) 0%, #e67e22 100%);
+      border-radius: 4px 0 0 4px;
+    }
+    .briefing-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .briefing-icon {
+      width: 32px; height: 32px;
+      background: var(--accent-soft);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .briefing-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .briefing-sublabel {
+      font-size: 11px;
+      color: var(--ink-4);
+      margin-left: auto;
+    }
+    .briefing-text {
+      font-family: var(--font-body);
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: var(--ink);
+      font-weight: 400;
+    }
+    .briefing-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .briefing-skeleton-line {
+      height: 14px;
+      background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-2) 50%, var(--surface-3) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease infinite;
+      border-radius: 6px;
+    }
+    .briefing-skeleton-line:nth-child(1) { width: 100%; }
+    .briefing-skeleton-line:nth-child(2) { width: 92%; }
+    .briefing-skeleton-line:nth-child(3) { width: 75%; }
+    @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+    .briefing-ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--ink-4);
+      margin-top: 14px;
+      padding: 3px 8px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 100px;
+    }
+    .briefing-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .briefing-share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-left: auto;
+    }
+    .briefing-share-btn:hover {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+    .briefing-share-btn.shared {
+      background: var(--green-soft);
+      color: var(--green);
+      border-color: var(--green);
+    }
+
+    /* ── Neden Önemli ─────────────────────────────── */
+    .explain-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .explain-btn:hover {
+      background: #fef9f0;
+      border-color: #e6a817;
+      color: #b8860b;
+    }
+    .explain-btn.loading {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .explain-panel {
+      margin-top: 14px;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, #fefcf7 0%, #fef9f0 100%);
+      border: 1px solid #f0e0b8;
+      border-radius: 10px;
+      animation: fadeIn 0.3s ease both;
+    }
+    .explain-panel-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .explain-panel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--ink-4);
+      margin-top: 10px;
+    }
+    .explain-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border-strong);
+      border-top-color: #b8860b;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
     .sidebar { position: sticky; top: 80px; }
     .sidebar-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     .sidebar-title { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
