@@ -194,6 +194,38 @@
       background: rgba(0,0,0,0.03);
       border-radius: 100px;
     }
+    .briefing-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .briefing-share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--ink-2);
+      font-size: 12px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-left: auto;
+    }
+    .briefing-share-btn:hover {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+    .briefing-share-btn.shared {
+      background: var(--green-soft);
+      color: var(--green);
+      border-color: var(--green);
+    }
 
     /* ── Neden Önemli ─────────────────────────────── */
     .explain-btn {
@@ -553,14 +585,64 @@
     const timeEl = document.getElementById('briefing-time');
     
     card.style.display = 'block';
+    window._briefingText = briefing.text;
     content.innerHTML = `
       <div class="briefing-text">${briefing.text}</div>
-      <div class="briefing-ai-badge">✨ AI tarafından ${briefing.newsCount || 10} haberden üretildi</div>
+      <div class="briefing-footer">
+        <span class="briefing-ai-badge">✨ AI tarafından ${briefing.newsCount || 10} haberden üretildi</span>
+        <button class="briefing-share-btn" onclick="shareBriefing(this)">📤 Paylaş</button>
+      </div>
     `;
     
     if (briefing.generatedAt) {
       const ago = Math.round((Date.now() - briefing.generatedAt) / 60000);
       timeEl.textContent = ago < 1 ? 'Az önce güncellendi' : `${ago} dk önce`;
+    }
+  }
+
+  async function shareBriefing(btn) {
+    const text = window._briefingText;
+    if (!text) return;
+    
+    const shareText = `📰 Gündemin Özeti\n\n${text}\n\n— haberimvar.app`;
+    const shareUrl = 'https://www.haberimvar.app';
+    
+    // Web Share API varsa (mobilde WhatsApp, Telegram vs. direkt açılır)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Gündemin Özeti — Haberimvar',
+          text: shareText,
+          url: shareUrl
+        });
+        btn.innerHTML = '✓ Paylaşıldı';
+        btn.classList.add('shared');
+        setTimeout(() => { btn.innerHTML = '📤 Paylaş'; btn.classList.remove('shared'); }, 3000);
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return; // Kullanıcı iptal etti
+      }
+    }
+    
+    // Desktop fallback — panoya kopyala
+    try {
+      await navigator.clipboard.writeText(shareText);
+      btn.innerHTML = '✓ Kopyalandı';
+      btn.classList.add('shared');
+      showToast('📋 Gündem özeti panoya kopyalandı!');
+      setTimeout(() => { btn.innerHTML = '📤 Paylaş'; btn.classList.remove('shared'); }, 3000);
+    } catch (e) {
+      // Son çare — eski yöntem
+      const ta = document.createElement('textarea');
+      ta.value = shareText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.innerHTML = '✓ Kopyalandı';
+      btn.classList.add('shared');
+      showToast('📋 Gündem özeti panoya kopyalandı!');
+      setTimeout(() => { btn.innerHTML = '📤 Paylaş'; btn.classList.remove('shared'); }, 3000);
     }
   }
 
