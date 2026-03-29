@@ -496,13 +496,16 @@
       startCountdown(data.nextUpdateIn || 900);
       setStatus('live', `Son güncelleme: az önce · ${data.articleCount} haber tarandı`);
       
-      // Brifing render
-      if (data.briefing?.text) {
-        renderBriefing(data.briefing);
+      // Brifing render — sadece Gündem'de
+      if (apiLoc === 'Gundem') {
+        if (data.briefing?.text) {
+          renderBriefing(data.briefing);
+        } else {
+          showBriefingSkeleton();
+          pollBriefing(apiLoc);
+        }
       } else {
-        // Brifing henüz hazır değil — skeleton göster ve polling başlat
-        showBriefingSkeleton();
-        pollBriefing(apiLoc);
+        document.getElementById('briefing-card').style.display = 'none';
       }
     } catch (err) {
       document.getElementById('main-content').innerHTML = `<div class="error-wrap">Haberler yüklenemedi: ${err.message}</div>`;
@@ -588,10 +591,10 @@
           <div class="news-summary">${item.summary}</div>
           <div class="news-footer">
             ${sourceChips}${extraChip}
-            <button class="explain-btn" onclick="event.stopPropagation(); explainNews(${i}, this)" title="Bu haber neden önemli?">💡 Neden Önemli?</button>
+            ${currentLoc === 'Gündem' ? `<button class="explain-btn" onclick="event.stopPropagation(); explainNews(${i}, this)" title="Bu haber neden önemli?">💡 Neden Önemli?</button>` : ''}
             ${timeChip}
           </div>
-          <div class="explain-panel" id="explain-${i}" style="display:none;"></div>
+          ${currentLoc === 'Gündem' ? `<div class="explain-panel" id="explain-${i}" style="display:none;"></div>` : ''}
         </div>
         <div class="news-arrow">→</div>
       </div>`;
