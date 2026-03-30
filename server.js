@@ -68,12 +68,21 @@ const SPAM_KEYWORDS = [
   'sponsorlu', 'reklam', 'advertorial', 'brand', 'partner içerik',
   'fırsatı kaçırmayın', 'hemen satın al', 'indirim fırsatı',
   'ücretsiz deneyin', 'tıklayın ve kazanın',
+  // TV ve program listesi
+  'yayın akışı', 'hangi kanalda ne var', 'günün filmleri',
+  'tv rehberi', 'televizyon programı', 'diziler ve programlar',
+  // Günlük tekrar eden SEO haberleri
+  'deprem mi oldu', 'nerede deprem oldu', 'son depremler listesi',
+  'altın fiyatları ne kadar', 'dolar ne kadar', 'euro ne kadar',
+  'hava durumu', 'namaz vakitleri', 'puan durumu',
 ];
 
 const CLICKBAIT_KEYWORDS = [
   'burç', 'astroloji', 'diyet', 'zayıflama', 'kilo ver',
   'tatil pozu', 'bikinili', 'sevgilisiyle', 'çekiliş', 'yarışma',
   'işte o an', 'bakın ne oldu', 'şaşırtan', 'inanamayacaksınız',
+  'olay yarattı', 'sosyal medyayı salladı', 'herkes bunu konuşuyor',
+  'kanınızı donduracak', 'tüyler ürpertici', 'ağlatan',
 ];
 
 const IMPORTANCE_KEYWORDS = {
@@ -179,12 +188,13 @@ function isSpam(title) {
   return false;
 }
 
-function getKeywords(title) {
-  return title
+function getKeywords(title, description) {
+  const text = title + ' ' + (description || '');
+  return text
     .toLowerCase()
     .replace(/[^\wğüşıöçĞÜŞİÖÇ\s]/g, '')
     .split(/\s+/)
-    .filter(w => w.length > 3 && !STOP_WORDS.has(w));
+    .filter(w => w.length > 2 && !STOP_WORDS.has(w));
 }
 
 function overlapCount(wordsA, wordsB) {
@@ -195,17 +205,21 @@ function overlapCount(wordsA, wordsB) {
 function clusterNews(items) {
   const clusters = [];
   for (const item of items) {
-    const words = getKeywords(item.title);
+    const words = getKeywords(item.title, item.description);
     let matched = false;
+    let bestOverlap = 0;
+    let bestCluster = null;
     for (const cluster of clusters) {
-      if (overlapCount(words, cluster.keywords) >= 2) {
-        cluster.items.push(item);
-        cluster.keywords = [...new Set([...cluster.keywords, ...words])];
-        matched = true;
-        break;
+      const overlap = overlapCount(words, cluster.keywords);
+      if (overlap >= 2 && overlap > bestOverlap) {
+        bestOverlap = overlap;
+        bestCluster = cluster;
       }
     }
-    if (!matched) {
+    if (bestCluster) {
+      bestCluster.items.push(item);
+      bestCluster.keywords = [...new Set([...bestCluster.keywords, ...words])];
+    } else {
       clusters.push({ keywords: words, items: [item] });
     }
   }
@@ -242,9 +256,9 @@ function scoreItem(item, clusterSize, location) {
   else                    score -= 50;
   score += Math.round((item.sourceWeight || 1.0) * 5);
   score += clusterBonus(clusterSize);
-  if (location === 'Gundem') {
-    const isSport = SPOR_KEYWORDS.some(kw => t.includes(kw));
-    if (isSport) score -= 0;
+  // Gündem'de tek kaynak haberlere ceza — çok kaynakla doğrulanmış haberler üste çıksın
+  if (location === 'Gundem' && clusterSize === 1) {
+    score -= 20;
   }
   return score;
 }
@@ -304,7 +318,7 @@ async function fetchNews(location) {
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
     summary: item.description?.slice(0, 300) || 'Detaylar için habere tıklayın.',
-    isBreaking: getItemAge(item) < 60 * 60 * 1000,
+    isBreaking: getItemAge(item) < 30 * 60 * 1000,
     sourceCount: item.sourceCount,
     sources: item.allSources,
     link: item.link,
@@ -316,7 +330,7 @@ async function fetchNews(location) {
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
     summary: item.description?.slice(0, 300) || '',
-    isBreaking: getItemAge(item) < 60 * 60 * 1000,
+    isBreaking: getItemAge(item) < 30 * 60 * 1000,
     sourceCount: item.sourceCount,
     sources: item.allSources,
     link: item.link,
