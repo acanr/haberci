@@ -723,9 +723,67 @@ app.get('/gizlilik', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'gizlilik.html'));
 });
 
-// ── Otomatik Tweet: Günlük sabah brifingi ──────────────────────
+// ── Twitter Test: Key doğrulama ──────────────────────
+app.get('/api/test-twitter', async function(req, res) {
+  try {
+    const { TwitterApi } = require('twitter-api-v2');
+    
+    const hasKeys = {
+      apiKey: !!process.env.TWITTER_API_KEY,
+      apiSecret: !!process.env.TWITTER_API_SECRET,
+      accessToken: !!process.env.TWITTER_ACCESS_TOKEN,
+      accessSecret: !!process.env.TWITTER_ACCESS_SECRET,
+      apiKeyPrefix: (process.env.TWITTER_API_KEY || '').slice(0, 5) + '...',
+      accessTokenPrefix: (process.env.TWITTER_ACCESS_TOKEN || '').slice(0, 5) + '...',
+    };
+
+    const twitterClient = new TwitterApi({
+      appKey: process.env.TWITTER_API_KEY,
+      appSecret: process.env.TWITTER_API_SECRET,
+      accessToken: process.env.TWITTER_ACCESS_TOKEN,
+      accessSecret: process.env.TWITTER_ACCESS_SECRET,
+    });
+
+    // Kullanıcı bilgilerini çek (okuma yetkisi yeterli)
+    const me = await twitterClient.v2.me();
+    
+    res.json({ 
+      success: true, 
+      keys: hasKeys, 
+      user: me.data,
+      message: 'Bağlantı başarılı! Şimdi tweet testi yapılacak...'
+    });
+  } catch (err) {
+    const detail = err.data?.detail || err.data?.errors?.[0]?.message || err.message;
+    const code = err.code || err.data?.status || 'unknown';
+    res.json({ 
+      success: false, 
+      error: detail, 
+      code,
+      keys: {
+        apiKey: !!process.env.TWITTER_API_KEY,
+        apiSecret: !!process.env.TWITTER_API_SECRET,
+        accessToken: !!process.env.TWITTER_ACCESS_TOKEN,
+        accessSecret: !!process.env.TWITTER_ACCESS_SECRET,
+      },
+      fullError: JSON.stringify(err.data || {})
+    });
+  }
+});
+
+// ── Otomatik Tweet: Günlük gündem özeti + top 3 haber ──────────────────────
+const CATEGORY_HASHTAGS = {
+  'Siyaset': '#siyaset #sondakika',
+  'Ekonomi': '#ekonomi #borsa',
+  'Güvenlik': '#sondakika #güvenlik',
+  'Deprem': '#deprem #sondakika',
+  'Spor': '#millitakım #spor',
+  'Teknoloji': '#teknoloji',
+  'Gündem': '#sondakika',
+  'Dünya': '#dünya #sondakika',
+};
+
 app.get('/api/cron/tweet', async function(req, res) {
-  // Vercel cron veya manuel tetikleme
   try {
     const { TwitterApi } = require('twitter-api-v2');
     
@@ -744,21 +802,40 @@ app.get('/api/cron/tweet', async function(req, res) {
 
     // AI brifing üret
     const briefing = await generateBriefing(data.news, 'Gundem');
+    const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+    const tweets = [];
 
-    if (!briefing?.text) {
-      return res.json({ success: false, error: 'Brifing üretilemedi' });
+    // Tweet 1: Gündem özeti
+    if (briefing?.text) {
+      const briefingTweet = `📰 Gündemin Özeti | ${today}\n\n${briefing.text.slice(0, 200)}\n\n15+ kaynaktan, yapay zeka ile derlendi\n🔗 haberimvar.app\n\n#gündem #haberler #türkiye`;
+      try {
+        const result = await twitterClient.v2.tweet(briefingTweet);
+        tweets.push({ type: 'briefing', id: result.data.id });
+        console.log('[TWEET] Brifing paylaşıldı:', result.data.id);
+      } catch (err) {
+        console.error('[TWEET ERROR] Brifing:', err.data?.detail || err.message);
+      }
     }
 
-    // Tarih formatı
-    const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+    // Tweet 2-4: Top 3 haber
+    const topNews = data.news.slice(0, 3);
+    for (const item of topNews) {
+      const category = item.category || 'Gündem';
+      const catHashtags = CATEGORY_HASHTAGS[category] || '#sondakika';
+      const sourcesText = item.sourceCount > 1 ? `${item.sourceCount} kaynak bu haberi doğruladı` : (item.sources?.[0] || '');
+      const tweetText = `🔴 ${item.headline.slice(0, 180)}\n\n${sourcesText}\n\n💡 AI analizi ve detay → haberimvar.app\n\n#gündem ${catHashtags}`;
+      
+      try {
+        await new Promise(r => setTimeout(r, 3000));
+        const result = await twitterClient.v2.tweet(tweetText);
+        tweets.push({ type: 'news', id: result.data.id, headline: item.headline.slice(0, 50) });
+        console.log('[TWEET] Haber paylaşıldı:', item.headline.slice(0, 40));
+      } catch (err) {
+        console.error('[TWEET ERROR] Haber:', err.data?.detail || err.message);
+      }
+    }
 
-    // Tek tweet: Gündem özeti + hashtag
-    const tweetText = `📰 Gündemin Özeti | ${today}\n\n${briefing.text.slice(0, 200)}\n\n15+ kaynaktan, yapay zeka ile derlendi\n🔗 haberimvar.app\n\n#gündem #haberler`;
-
-    const result = await twitterClient.v2.tweet(tweetText);
-    console.log('[TWEET] Gündem özeti paylaşıldı:', result.data.id);
-
-    res.json({ success: true, tweeted: 1, tweetId: result.data.id });
+    res.json({ success: true, tweeted: tweets.length, tweets });
   } catch (err) {
     const detail = err.data?.detail || err.data?.errors?.[0]?.message || err.message;
     const code = err.code || err.data?.status || 'unknown';
