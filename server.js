@@ -68,13 +68,18 @@ const SPAM_KEYWORDS = [
   'sponsorlu', 'reklam', 'advertorial', 'brand', 'partner içerik',
   'fırsatı kaçırmayın', 'hemen satın al', 'indirim fırsatı',
   'ücretsiz deneyin', 'tıklayın ve kazanın',
-  // TV ve program listesi
+  // TV, dizi ve program listesi
   'yayın akışı', 'hangi kanalda ne var', 'günün filmleri',
   'tv rehberi', 'televizyon programı', 'diziler ve programlar',
+  'yeni bölüm ne zaman', 'ne zaman yayınlanacak', 'fragmanı izle',
+  'bölüm izle', 'canlı izle', 'final bölümü ne zaman',
   // Günlük tekrar eden SEO haberleri
   'deprem mi oldu', 'nerede deprem oldu', 'son depremler listesi',
+  'son depremler hakkında', 'deprem haritası',
   'altın fiyatları ne kadar', 'dolar ne kadar', 'euro ne kadar',
   'hava durumu', 'namaz vakitleri', 'puan durumu',
+  'yaz saati uygulaması', 'kış saati uygulaması', 'saatler ileri alındı',
+  'saatler geri alınacak mı', 'resmi tatil', 'tatil kaç gün',
 ];
 
 const CLICKBAIT_KEYWORDS = [
@@ -310,10 +315,20 @@ async function fetchNews(location) {
 
   console.log(`[SCORE] ${location} top 3: ${sorted.slice(0,3).map(i => `"${i.title.slice(0,30)}" (${i.score}p, ${i.clusterSize}src)`).join(' | ')}`);
 
-  // Gündem → 10 haber, diğerleri → 20 haber
-  const limit = location === 'Gundem' ? 10 : 20;
+  // Gündem → AI sıralama ile top 10, diğerleri → 20 haber
+  let finalNews;
+  if (location === 'Gundem') {
+    const candidates = sorted.slice(0, 20);
+    finalNews = await aiRankNews(candidates);
+    // AI başarısız olursa algoritmik sıralamaya geri dön
+    if (!finalNews) {
+      finalNews = candidates.slice(0, 10);
+    }
+  } else {
+    finalNews = sorted.slice(0, 20);
+  }
 
-  const news = sorted.slice(0, limit).map((item, i) => ({
+  const news = finalNews.map((item, i) => ({
     rank: i + 1,
     category: guessCategory(item.title, item.description, location),
     headline: item.title,
@@ -350,6 +365,71 @@ async function fetchNews(location) {
     nextUpdateIn: 900,
     source: 'rss',
   };
+}
+
+// ── AI Haber Sıralama: Gündem için Claude ile final 10 seçimi ──────
+async function aiRankNews(candidates) {
+  if (!candidates || candidates.length === 0) return null;
+
+  const today = new Date().toLocaleDateString('tr-TR', {
+    day: 'numeric', month: 'long', year: 'numeric', weekday: 'long'
+  });
+
+  const candidateText = candidates.map((c, i) =>
+    `[${i + 1}] KAYNAK_SAYISI:${c.sourceCount} | KAYNAKLAR:${c.allSources.join(', ')} | BAŞLIK: ${c.title} | ÖZET: ${(c.description || '').slice(0, 120)}`
+  ).join('\n');
+
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      messages: [{
+        role: 'user',
+        content: `Bugün ${today}. Aşağıda Türkiye gündeminden ${candidates.length} haber adayı var. Bunlardan EN ÖNEMLİ 10 tanesini seç ve önem sırasına göre sırala.
+
+SEÇİM KRİTERLERİ:
+- Ulusal/uluslararası öneme sahip haberler üstte olsun
+- Çok kaynaklı (birden fazla kaynak doğrulamış) haberler daha güvenilir
+- Yerel kazalar, küçük olaylar önemli değilse elenmeli
+- TV programı, dizi, yayın akışı, hava durumu, günlük tekrar eden SEO haberleri ELENMELİ
+- Aynı konudaki haberlerden sadece biri seçilmeli (tekrar olmasın)
+- Siyaset, ekonomi, güvenlik, uluslararası ilişkiler gibi konular önemli
+
+SADECE seçtiğin 10 haberin numaralarını önem sırasına göre JSON array olarak döndür, başka hiçbir şey yazma:
+[3, 7, 1, 12, ...]
+
+ADAYLAR:
+${candidateText}`
+      }],
+    });
+
+    const raw = message.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim();
+
+    // JSON array parse et
+    const start = raw.indexOf('[');
+    const end = raw.lastIndexOf(']');
+    if (start === -1 || end === -1) throw new Error('JSON array bulunamadı');
+
+    const indices = JSON.parse(raw.slice(start, end + 1));
+    
+    // Index'leri haber objelerine çevir (1-indexed → 0-indexed)
+    const ranked = indices
+      .slice(0, 10)
+      .map(idx => candidates[idx - 1])
+      .filter(Boolean);
+
+    if (ranked.length < 5) throw new Error('Yeterli haber seçilmedi: ' + ranked.length);
+
+    console.log(`[AI RANK] ${ranked.length} haber seçildi: ${ranked.slice(0,3).map(r => r.title.slice(0,30)).join(' | ')}`);
+    return ranked;
+  } catch (err) {
+    console.error('[AI RANK ERROR]', err.message);
+    return null; // Fallback: algoritmik sıralama kullanılacak
+  }
 }
 
 // ── Günün Brifingi: AI ile haber özeti üretimi ──────────────────────
