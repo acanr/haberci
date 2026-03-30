@@ -470,8 +470,10 @@ async function generateBriefing(newsItems, location) {
 
 Bu haberlerden yola çıkarak "Gündemin Özeti" yaz. Kurallar:
 - TAM OLARAK 2-3 cümle yaz, fazla değil
-- Doğal, akıcı Türkçe kullan — haber bülteni gibi değil, zeki bir arkadaşın sabah özetlemesi gibi
+- Doğal, akıcı Türkçe kullan
 - En önemli 2-3 gelişmeyi birbirine bağlayarak anlat
+- TARAFSIZ ol — yorum yapma, değerlendirme yapma, yönlendirme yapma
+- Sadece ne olduğunu aktar, neden önemli olduğunu veya ne yapılması gerektiğini yazma
 - Başlık veya kaynak adı yazma, sadece özet paragraf
 - "Bugün" veya "Gündemde" ile başlama, doğrudan konuya gir
 
@@ -584,13 +586,15 @@ app.post('/api/explain', async function(req, res) {
       max_tokens: 300,
       messages: [{
         role: 'user',
-        content: `Aşağıdaki haber başlığını ve özetini oku. Sonra bu haberin neden önemli olduğunu sıradan bir Türk vatandaşına açıkla.
+        content: `Aşağıdaki haber başlığını ve özetini oku. Bu haberin arka planını ve bağlamını kısaca açıkla.
 
 Kurallar:
 - TAM OLARAK 2-3 cümle yaz
-- İlk cümle: bu haberin arka planı/bağlamı (kısaca)
-- İkinci cümle: bunun sıradan bir insanın hayatına etkisi veya neden umursaması gerektiği
-- Sade, anlaşılır Türkçe kullan — akademik değil, sohbet gibi
+- Sadece haberin arka planını, bağlamını ve önceki gelişmelerle ilişkisini açıkla
+- TARAFSIZ ve NÖT ol — yorum yapma, akıl verme, yönlendirme, tavsiye verme
+- "Yapmalısınız", "dikkat etmelisiniz", "endişe verici", "olumlu/olumsuz" gibi değerlendirme ifadeleri KULLANMA
+- Kişisel görüş veya tahmin belirtme
+- Sade, anlaşılır Türkçe kullan
 - "Bu haber önemli çünkü" gibi klişelerle başlama, doğrudan konuya gir
 
 Başlık: ${headline}
