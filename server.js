@@ -809,9 +809,12 @@ app.get('/api/cron/tweet', async function(req, res) {
     const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
     const tweets = [];
 
-    // Tweet 1: Gündem özeti
+    // Tweet 1: Gündem özeti (max 280 karakter)
     if (briefing?.text) {
-      const briefingTweet = `📰 Gündemin Özeti | ${today}\n\n${briefing.text.slice(0, 200)}\n\n15+ kaynaktan, yapay zeka ile derlendi\n🔗 haberimvar.app\n\n#gündem #haberler #türkiye`;
+      const header = `📰 Gündemin Özeti | ${today}\n\n`;
+      const footer = `\n\nhaberimvar.app\n\n#gündem #haberler`;
+      const maxBriefingLen = 280 - header.length - footer.length;
+      const briefingTweet = header + briefing.text.slice(0, maxBriefingLen) + footer;
       try {
         const result = await twitterClient.v2.tweet(briefingTweet);
         tweets.push({ type: 'briefing', id: result.data.id });
@@ -821,13 +824,15 @@ app.get('/api/cron/tweet', async function(req, res) {
       }
     }
 
-    // Tweet 2-4: Top 3 haber
+    // Tweet 2-4: Top 3 haber (max 280 karakter)
     const topNews = data.news.slice(0, 3);
     for (const item of topNews) {
       const category = item.category || 'Gündem';
       const catHashtags = CATEGORY_HASHTAGS[category] || '#sondakika';
-      const sourcesText = item.sourceCount > 1 ? `${item.sourceCount} kaynak bu haberi doğruladı` : (item.sources?.[0] || '');
-      const tweetText = `🔴 ${item.headline.slice(0, 180)}\n\n${sourcesText}\n\n💡 AI analizi ve detay → haberimvar.app\n\n#gündem ${catHashtags}`;
+      const sourcesText = item.sourceCount > 1 ? `\n\n${item.sourceCount} kaynak` : '';
+      const footer = `${sourcesText}\n\nhaberimvar.app\n\n#gündem ${catHashtags}`;
+      const maxHeadlineLen = 280 - 3 - footer.length; // 3 = "🔴 "
+      const tweetText = `🔴 ${item.headline.slice(0, maxHeadlineLen)}${footer}`;
       
       try {
         await new Promise(r => setTimeout(r, 3000));
