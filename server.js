@@ -532,11 +532,6 @@ app.get('/api/news', async function(req, res) {
       generateBriefing(data.news, loc).catch(err => 
         console.error('[BRIEFING BG]', err.message)
       );
-      
-      // Yeni haberleri otomatik tweetle (arka planda)
-      tweetNewHeadlines(data.news).catch(err =>
-        console.error('[AUTO TWEET BG]', err.message)
-      );
     }
     
     const briefing = loc === 'Gundem' ? briefingCache.get(`briefing_${loc}`) : null;
