@@ -10,6 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Claude API client for briefing generation
 const anthropic = new Anthropic();
 const briefingCache = new Map();
+const tweetedHeadlines = new Set(); // Daha önce tweetlenmiş haber başlıkları
 
 const LOCATIONS = ['Gundem', 'Dunya', 'Ekonomi', 'Spor', 'Teknoloji', 'KulturSanat'];
 
@@ -531,6 +532,11 @@ app.get('/api/news', async function(req, res) {
       generateBriefing(data.news, loc).catch(err => 
         console.error('[BRIEFING BG]', err.message)
       );
+      
+      // Yeni haberleri otomatik tweetle (arka planda)
+      tweetNewHeadlines(data.news).catch(err =>
+        console.error('[AUTO TWEET BG]', err.message)
+      );
     }
     
     const briefing = loc === 'Gundem' ? briefingCache.get(`briefing_${loc}`) : null;
@@ -727,6 +733,84 @@ app.get('/gizlilik', function(req, res) {
   res.sendFile(path.join(__dirname, 'public', 'gizlilik.html'));
 });
 
+// ── Otomatik Tweet: Yeni haber algılama ve tweet atma ──────────────────────
+const CATEGORY_HASHTAGS = {
+  'Siyaset': '#siyaset #sondakika',
+  'Ekonomi': '#ekonomi #borsa',
+  'Güvenlik': '#sondakika #güvenlik',
+  'Deprem': '#deprem #sondakika',
+  'Spor': '#millitakım #spor',
+  'Teknoloji': '#teknoloji',
+  'Gündem': '#sondakika',
+  'Dünya': '#dünya #sondakika',
+};
+
+async function tweetNewHeadlines(newsItems) {
+  if (!newsItems || newsItems.length === 0) return;
+  if (!process.env.TWITTER_API_KEY) return; // Key yoksa sessizce çık
+
+  // İlk çalıştırmada mevcut haberleri kaydet, tweet atma
+  if (tweetedHeadlines.size === 0) {
+    newsItems.forEach(item => tweetedHeadlines.add(item.headline));
+    console.log(`[AUTO TWEET] İlk yükleme — ${newsItems.length} haber kaydedildi, tweet atılmadı`);
+    return;
+  }
+
+  // Yeni haberleri bul
+  const newItems = newsItems.filter(item => !tweetedHeadlines.has(item.headline));
+  if (newItems.length === 0) {
+    console.log('[AUTO TWEET] Yeni haber yok');
+    return;
+  }
+
+  console.log(`[AUTO TWEET] ${newItems.length} yeni haber bulundu`);
+
+  try {
+    const { TwitterApi } = require('twitter-api-v2');
+    const twitterClient = new TwitterApi({
+      appKey: process.env.TWITTER_API_KEY,
+      appSecret: process.env.TWITTER_API_SECRET,
+      accessToken: process.env.TWITTER_ACCESS_TOKEN,
+      accessSecret: process.env.TWITTER_ACCESS_SECRET,
+    });
+
+    // Max 2 tweet at (spam olmasın)
+    const toTweet = newItems.slice(0, 2);
+    
+    for (const item of toTweet) {
+      const category = item.category || 'Gündem';
+      const catHashtags = CATEGORY_HASHTAGS[category] || '#sondakika';
+      const sourcesText = item.sourceCount > 1 ? `\n\n${item.sourceCount} kaynak` : '';
+      const footer = `${sourcesText}\n\nhaberimvar.app\n\n#gündem ${catHashtags}`;
+      const maxLen = 280 - 3 - footer.length;
+      const tweetText = `🔴 ${item.headline.slice(0, maxLen)}${footer}`;
+
+      try {
+        await twitterClient.v2.tweet(tweetText);
+        tweetedHeadlines.add(item.headline);
+        console.log(`[AUTO TWEET] ✅ ${item.headline.slice(0, 50)}`);
+        // Rate limit — tweetler arası 3 saniye bekle
+        await new Promise(r => setTimeout(r, 3000));
+      } catch (err) {
+        console.error(`[AUTO TWEET ERROR] ${err.data?.detail || err.message}`);
+      }
+    }
+
+    // Geri kalan yeni haberleri de listeye ekle (tweet atmadan)
+    newItems.forEach(item => tweetedHeadlines.add(item.headline));
+
+    // Set'i temiz tut — max 100 haber hatırla
+    if (tweetedHeadlines.size > 100) {
+      const arr = [...tweetedHeadlines];
+      arr.splice(0, arr.length - 100);
+      tweetedHeadlines.clear();
+      arr.forEach(h => tweetedHeadlines.add(h));
+    }
+  } catch (err) {
+    console.error('[AUTO TWEET INIT ERROR]', err.message);
+  }
+}
+
 // ── Twitter Test: Key doğrulama ──────────────────────
 app.get('/api/test-twitter', async function(req, res) {
   try {
@@ -775,17 +859,7 @@ app.get('/api/test-twitter', async function(req, res) {
   }
 });
 
-// ── Otomatik Tweet: Günlük gündem özeti + top 3 haber ──────────────────────
-const CATEGORY_HASHTAGS = {
-  'Siyaset': '#siyaset #sondakika',
-  'Ekonomi': '#ekonomi #borsa',
-  'Güvenlik': '#sondakika #güvenlik',
-  'Deprem': '#deprem #sondakika',
-  'Spor': '#millitakım #spor',
-  'Teknoloji': '#teknoloji',
-  'Gündem': '#sondakika',
-  'Dünya': '#dünya #sondakika',
-};
+// ── Günlük Cron: Gündem özeti tweet ──────────────────────
 
 app.get('/api/cron/tweet', async function(req, res) {
   try {
