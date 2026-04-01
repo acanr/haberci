@@ -447,10 +447,19 @@ ${candidateText}`
       .map(idx => candidates[idx - 1])
       .filter(Boolean);
 
-    if (ranked.length < 5) throw new Error('Yeterli haber seçilmedi: ' + ranked.length);
+    // Tek kaynak haberlerde aynı kaynaktan max 2 haber sınırı
+    const singleSourceCount = {};
+    const diversified = ranked.filter(item => {
+      if (item.sourceCount > 1) return true; // Çok kaynaklı → her zaman al
+      const src = item.allSources?.[0] || 'unknown';
+      singleSourceCount[src] = (singleSourceCount[src] || 0) + 1;
+      return singleSourceCount[src] <= 2; // Aynı tek kaynaktan max 2
+    });
 
-    console.log(`[AI RANK] ${ranked.length} haber seçildi: ${ranked.slice(0,3).map(r => r.title.slice(0,30)).join(' | ')}`);
-    return ranked;
+    if (diversified.length < 5) throw new Error('Yeterli haber seçilmedi: ' + diversified.length);
+
+    console.log(`[AI RANK] ${diversified.length} haber seçildi (${ranked.length - diversified.length} tek kaynak elendi): ${diversified.slice(0,3).map(r => r.title.slice(0,30)).join(' | ')}`);
+    return diversified;
   } catch (err) {
     console.error('[AI RANK ERROR]', err.message);
     return null; // Fallback: algoritmik sıralama kullanılacak
