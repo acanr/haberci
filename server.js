@@ -280,7 +280,7 @@ function scoreItem(item, clusterSize, location) {
   score += clusterBonus(clusterSize);
   // Gündem'de tek kaynak haberlere ceza — çok kaynakla doğrulanmış haberler üste çıksın
   if (location === 'Gundem' && clusterSize === 1) {
-    score -= 20;
+    score -= 35;
   }
   return score;
 }
@@ -413,6 +413,8 @@ async function aiRankNews(candidates) {
 SEÇİM KRİTERLERİ:
 - Ulusal/uluslararası öneme sahip haberler üstte olsun
 - Çok kaynaklı (birden fazla kaynak doğrulamış) haberler daha güvenilir
+- TEK KAYNAKLI haberler sadece çok önemliyse seçilsin, mümkünse çok kaynaklı haberleri tercih et
+- KAYNAK ÇEŞİTLİLİĞİ ÖNEMLİ: Aynı kaynaktan (örn. sadece TRT Haber) gelen tek kaynaklı haberlerden EN FAZLA 2 TANE seç. Farklı kaynaklardan gelen haberleri tercih et.
 - Yerel kazalar, küçük olaylar önemli değilse elenmeli
 - TV programı, dizi, yayın akışı, hava durumu, günlük tekrar eden SEO haberleri ELENMELİ
 - Aynı konudaki haberlerden sadece biri seçilmeli (tekrar olmasın)
