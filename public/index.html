@@ -852,7 +852,7 @@
             ${item.sourceCount > 1 ? `<span class="src-badge">${item.sourceCount} kaynak</span>` : ''}
           </div>
           <div class="news-headline">${item.headline}</div>
-          <div class="news-summary">${item.summary}</div>
+          ${item.summary ? `<div class="news-summary">${item.summary}</div>` : ''}
           <div class="news-footer">
             ${sourceChips}${extraChip}
             ${currentLoc === 'Gündem' ? `<button class="explain-btn" onclick="event.stopPropagation(); explainNews(${i}, this)" title="Bu haber neden önemli?">💡 Neden Önemli?</button>` : ''}
@@ -920,7 +920,7 @@
         ${ago ? `<span style="font-size:12px;color:var(--ink-4);margin-left:auto;">${ago}</span>` : ''}
       </div>
       <div class="news-modal-headline">${item.headline}</div>
-      <div class="news-modal-summary">${item.summary}</div>
+      ${item.summary ? `<div class="news-modal-summary">${item.summary}</div>` : ''}
       <div class="news-modal-sources">
         <span class="news-modal-sources-label">Kaynaklar:</span>
         ${sourceChips}
