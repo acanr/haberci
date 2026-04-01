@@ -133,6 +133,22 @@ function decodeEntities(str) {
     .replace(/&apos;/g, "'").replace(/&#\d+;/g, '').trim();
 }
 
+// RSS özetlerindeki çöp metinleri temizle
+function cleanSummary(text) {
+  if (!text) return '';
+  return text
+    .replace(/-->/g, '')
+    .replace(/Devamı için tıklayınız\.?/gi, '')
+    .replace(/\.\.\.Devamı için tıklayınız/gi, '')
+    .replace(/İlginizi Çekebilir/gi, '')
+    .replace(/Devamı için habere tıklayın\.?/gi, '')
+    .replace(/Detaylar için tıklayın\.?/gi, '')
+    .replace(/Haberin devamı için tıklayın\.?/gi, '')
+    .replace(/\s*\.\.\.\s*$/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 function extractTag(xml, tag) {
   const match = xml.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i'));
   if (!match) return '';
@@ -145,7 +161,7 @@ function parseRSS(xml, source) {
   for (const match of matches) {
     const content = match[1];
     const title = extractTag(content, 'title');
-    const description = extractTag(content, 'description') || extractTag(content, 'announce');
+    const description = cleanSummary(extractTag(content, 'description') || extractTag(content, 'announce'));
     const pubDate = extractTag(content, 'pubDate');
     let link = extractTag(content, 'link')
       || content.match(/<link>([^<]+)<\/link>/i)?.[1]
@@ -329,31 +345,37 @@ async function fetchNews(location) {
     finalNews = sorted.slice(0, 20);
   }
 
-  const news = finalNews.map((item, i) => ({
-    rank: i + 1,
-    category: guessCategory(item.title, item.description, location),
-    headline: item.title,
-    summary: item.description?.slice(0, 300) || 'Detaylar için habere tıklayın.',
-    isBreaking: getItemAge(item) < 30 * 60 * 1000,
-    sourceCount: item.sourceCount,
-    sources: item.allSources,
-    link: item.link,
-    score: item.score,
-    pubDate: item.pubDate,
-  }));
+  const news = finalNews.map((item, i) => {
+    const cleanDesc = cleanSummary(item.description);
+    return {
+      rank: i + 1,
+      category: guessCategory(item.title, item.description, location),
+      headline: item.title,
+      summary: cleanDesc && cleanDesc.length > 10 ? cleanDesc.slice(0, 300) : '',
+      isBreaking: getItemAge(item) < 30 * 60 * 1000,
+      sourceCount: item.sourceCount,
+      sources: item.allSources,
+      link: item.link,
+      score: item.score,
+      pubDate: item.pubDate,
+    };
+  });
 
-  const allNews = sorted.slice(0, 100).map(item => ({
-    category: guessCategory(item.title, item.description, location),
-    headline: item.title,
-    summary: item.description?.slice(0, 300) || '',
-    isBreaking: getItemAge(item) < 30 * 60 * 1000,
-    sourceCount: item.sourceCount,
-    sources: item.allSources,
-    link: item.link,
-    score: item.score,
-    pubDate: item.pubDate,
-    location,
-  }));
+  const allNews = sorted.slice(0, 100).map(item => {
+    const cleanDesc = cleanSummary(item.description);
+    return {
+      category: guessCategory(item.title, item.description, location),
+      headline: item.title,
+      summary: cleanDesc && cleanDesc.length > 10 ? cleanDesc.slice(0, 300) : '',
+      isBreaking: getItemAge(item) < 30 * 60 * 1000,
+      sourceCount: item.sourceCount,
+      sources: item.allSources,
+      link: item.link,
+      score: item.score,
+      pubDate: item.pubDate,
+      location,
+    };
+  });
 
   return {
     news,
