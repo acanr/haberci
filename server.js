@@ -32,7 +32,6 @@ const RSS_SOURCES = {
     { name: 'DW Türkçe',       url: 'https://rss.dw.com/rdf/rss-tur-all',                     weight: 1.0 },
     { name: 'BBC Türkçe',      url: 'https://feeds.bbci.co.uk/turkish/rss.xml',               weight: 1.2 },
     { name: 'Cumhuriyet Dünya',url: 'https://www.cumhuriyet.com.tr/rss/dunya',                weight: 1.0 },
-    { name: 'Sözcü Dünya',     url: 'https://www.sozcu.com.tr/rss/dunya.xml',                 weight: 1.0 },
     { name: 'TRT Dünya',       url: 'https://www.trthaber.com/dunya_articles.rss',            weight: 1.0 },
     { name: 'Sabah Dünya',     url: 'https://www.sabah.com.tr/rss/dunya.xml',                 weight: 1.0 },
     { name: 'Haberturk Dünya', url: 'https://www.haberturk.com/rss/dunya.xml',                weight: 1.0 },
